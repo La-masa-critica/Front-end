@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "nombre": "Sin Gluten",
+    "fotoUrl": "https://www.campkudzu.org/wp-content/uploads/2018/12/gluten-free-icon.png",
+    "productos": []
+  },
+  {
+    "id": 2,
+    "nombre": "De Trigo",
+    "fotoUrl": "https://i.pinimg.com/736x/b6/96/c5/b696c5cbc18fc05c7d103aadfc5d9796.jpg",
+    "productos": [
+      {
+        "id": "1",
+        "nombre":"Pan blanco",
+        "precio": 1000,
+        "esVegano":false,
+        "esCeliaco":false,
+        "ingredientes": ["Agua","Levadura","Sal","Harina de Trigo","Azucar"],
+        "fotoUrl": "https://www.recetasnestle.com.do/sites/default/files/styles/recipe_detail_desktop/public/srh_recipes/625b703fb44882f93d81818017559317.webp?itok=C3LLdPpf"
+      },
+      {
+        "id": "2",
+        "nombre":"Pan integral",
+        "precio": 1500,
+        "esVegano":false,
+        "esCeliaco":false,
+        "ingredientes": ["Agua","Levadura","Sal", "Harina de Trigo Integral"],
+        "fotoUrl": "https://blog.elamasadero.com/wp-content/uploads/pan_integral_espelta_700.jpg"
+      },
+      {
+        "id": "3",
+        "nombre":"Pan de centeno",
+        "precio": 1300,
+        "esVegano":true,
+        "esCeliaco":false,
+        "ingredientes": ["Agua","Levadura","Sal","Harina de Centeno","Semillas"],
+        "fotoUrl": "https://elmimbreonline.com/blog/wp-content/uploads/2021/07/propiedades-y-beneficios-del-pan-de-centeno-1024x576.jpg"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "nombre": "De Maiz",
+    "fotoUrl": "https://radionacional-v3.s3.amazonaws.com/s3fs-public/inline-images/PAN%20DE%20MA%C3%8DZ%20DE%20LAS%20MART%C3%8DNEZ%202.jpg",
+    "productos": []
+  },
+  {
+    "id": 4,
+    "nombre": "Masa Madre",
+    "fotoUrl": "https://chefeel.com/chefgeneralfiles/2021/10/pan-880x778.jpg",
+    "productos": []
+  },
+  {
+    "id": 5,
+    "nombre": "Planos",
+    "fotoUrl": "https://paulasapron.com/wp-content/uploads/2021/12/Turkish-Flatbread-Bazlama-Pan-Plano-Turco-3-683x1024.jpg",
+    "productos": []
+  },
+  {
+    "id": 6,
+    "nombre": "Dulces",
+    "fotoUrl": "https://www.eluniversal.com.mx/resizer/v2/RDDS64GZUFG5PPQ3P7PL2SX23U.jpg?auth=e39b81c2a9f77d0966675a080d345600c95ec1ba3a60e47fd25afe7c5845f4d1&smart=true&width=1100&height=666",
+    "productos": []
+  }
+]
