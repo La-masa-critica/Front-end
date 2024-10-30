@@ -29,7 +29,7 @@ export class CarritoComponent {
 
 
   ngOnInit(): void {
-    this.headerService.titulo.set("Carrito");
+    this.headerService.titulo.set("La masa crítica");
     this.cartService.carrito.forEach(async itemCarrito =>{
       const res = await this.productosService.getById(itemCarrito.idProducto)
       if(res) this.productosCarrito.push(res);
@@ -37,8 +37,17 @@ export class CarritoComponent {
     })
   }
 
-  eliminarProducto(idProducto:number){
+  /*eliminarProducto(idProducto:number){
     this.cartService.eliminarProducto(idProducto);
+  }*/
+
+  eliminarProducto(idProducto: number) {
+    const index = this.cartService.carrito.findIndex(item => item.idProducto === idProducto);
+    if (index !== -1) {
+      this.cartService.eliminarProducto(idProducto);
+      this.productosCarrito.splice(index, 1); 
+      this.calcularInformacion(); 
+    }
   }
 
   calcularInformacion (){

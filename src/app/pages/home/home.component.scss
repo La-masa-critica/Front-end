@@ -1,7 +1,22 @@
-#categorias-container{
-  margin: 20px 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  justify-items: center;
-  gap: 20px 0;
+.grancontenedor {
+  display: flex; 
+  gap: 5px; 
+}
+
+#productos-container {
+  flex: 2; 
+  display: flex; 
+  flex-direction: column; 
+  width: 100%; 
+  height: 100%;
+}
+
+app-tarjeta-producto {
+  flex: 0 0 100%; 
+  margin-bottom: 5px; 
+  padding: 0; 
+}
+
+#carrito {
+  flex: 1; 
 }
