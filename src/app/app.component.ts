@@ -19,10 +19,10 @@ export class AppComponent implements OnInit {
   selectedCategoryId: number | null = null; // Cambiado a null
   itemIdToShow: Item | null = null; 
   cart: { item: Item; quantity: number }[] = [];
-  
+  minPrice: string = ''; 
+  maxPrice: string = '';
   cart2: Cart = { cartId: 0, items: [] };
   total: number = 0;
-
   constructor(private itemService: ItemService, private categoryService: CategoryService,private cartService: CartService) {}
 
   ngOnInit(): void {
@@ -146,5 +146,39 @@ export class AppComponent implements OnInit {
       });
     });
   }
+
+  filterItems(): void {
+    // Configura los parámetros para el filtro
+    let categoryIds: number[]  | undefined;
+
+    // Si se selecciona una categoría válida, la agregamos a categoryIds
+    if (this.selectedCategoryId && this.selectedCategoryId != 0) {
+        categoryIds = [this.selectedCategoryId]; //Si escogio categoria y es distinto a id 0 hace esto
+    } else {
+        // Si selectedCategoryId es 0 o no está definido, obtenemos todas las categorías
+        categoryIds = undefined;
+    }
+    
+    // Procesamos los precios
+    const minPrice = this.minPrice ? parseFloat(this.minPrice) : undefined; // Cambiamos a undefined
+    const maxPrice = this.maxPrice ? parseFloat(this.maxPrice) : undefined; // Cambiamos a undefined
+    console.log(minPrice);
+    console.log(maxPrice);
+    console.log(categoryIds);
+    console.log(this.categories.map(category => category.id));
+    // Llama a `filterItems` en `itemService`, pasando los parámetros necesarios
+    this.itemService.filterItems(categoryIds, minPrice, maxPrice).subscribe(filteredItems => {
+        // Comprobamos si no hay productos filtrados
+        if (filteredItems.length === 0) {
+            console.log('No se encontraron productos con los filtros aplicados.');
+        }
+        this.items = filteredItems; // Actualiza la lista de productos mostrada
+    });
+}
+
+
+
+  
+
   
 }

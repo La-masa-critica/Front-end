@@ -1,13 +1,25 @@
 <div class="superior"><h1 style="justify-content: center;">La masa crítica</h1></div>
 
 <div class="container">
+  
   <div class="filters">
     <h2>Filtros</h2>
+    
+    <!-- Filtro por categoría -->
     <label for="category">Seleccionar categoría:</label>
-    <select id="category" [(ngModel)]="selectedCategoryId" (change)="filterItemsByCategory()">
+    <select id="category" multiple [(ngModel)]="selectedCategoryId" (change)="filterItemsByCategory()">
       <option [value]="0">Todas las categorías</option>
       <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
     </select>
+  
+    <!-- Filtros por precio -->
+    <label for="minPrice">Precio mínimo:</label>
+    <input type="number" id="minPrice" [(ngModel)]="minPrice" (change)="filterItems()">
+  
+    <label for="maxPrice">Precio máximo:</label>
+    <input type="number" id="maxPrice" [(ngModel)]="maxPrice" (change)="filterItems()">
+  
+    <button (click)="filterItems()">Aplicar Filtros</button>
   </div>
 
   <div class="products">
@@ -32,6 +44,6 @@
       <button (click)="removeFromCart(cartItem.item)">Eliminar del carrito</button>
     </div>
     <h3>Total: {{ totalAmount() | number: '1.2-2' }}</h3>
-    <button (click)="confirmCart()" style="width: 100%;">Confirmar y comprar carrito</button>
+    <button (click)="confirmCart()" style="width: 100%;">Proceder al checkout</button>
   </div>
 </div>

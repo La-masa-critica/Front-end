@@ -80,3 +80,30 @@ h2 {
   font-size: 1.5em;
   font-weight: bold;
 }
+
+
+
+.filters {
+  display: flex;
+  flex-direction: column; /* Asegura que los elementos estén en columnas */
+  width: 30%; /* Ajusta el ancho según tus necesidades */
+  margin: 0 auto; /* Centra el contenedor de filtros */
+}
+
+.filters label {
+  margin-top: 10px; /* Espacio arriba de cada etiqueta */
+  margin-bottom: 5px; /* Espacio abajo de cada etiqueta */
+}
+
+.filters select,
+.filters input {
+  width: 100%; /* Hace que el select y los inputs ocupen el 100% del ancho disponible */
+  padding: 8px; /* Añade un poco de padding para mejorar la apariencia */
+  box-sizing: border-box; /* Asegura que el padding no afecte al ancho total */
+}
+
+.filters button {
+  margin-top: 15px; /* Espacio arriba del botón */
+  padding: 10px; /* Espacio interno del botón */
+  cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
+}
