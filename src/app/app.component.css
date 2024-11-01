@@ -1,0 +1,82 @@
+/* Estilos generales de contenedor */
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: auto; /* Permitir desplazamiento */
+}
+.container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: rgb(111, 78, 55);
+  flex-grow: 1;
+  overflow: auto; /* Cambiado a auto para permitir desplazamiento */
+  height: calc(100% - 80px); /* Ajustar el contenedor principal para que no ocupe toda la altura */
+}
+
+/* Secciones con bordes y sombras */
+.filters, .products, .cart {
+  border: 1px solid rgb(166, 123, 91);
+  padding: 20px;
+  margin: 0 10px;
+  flex: 1;
+  box-shadow: 0 2px 5px rgba(96, 63, 38, 0.2);
+  background-color: rgb(249, 224, 187);
+  margin-bottom: 0;
+  max-height: calc(100vh - 120px); /* Asegúrate de que no se desborden */
+  overflow-y: auto; /* Permitir desplazamiento vertical en las secciones */
+}
+
+/* Encabezados */
+h2 {
+  text-align: center;
+  color: rgb(136, 74, 57);
+  border-bottom: 2px solid rgb(195, 129, 84);
+  padding-bottom: 10px;
+}
+
+/* Estilos de productos */
+.products {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra los productos horizontalmente */
+}
+
+.products h3 {
+  color: rgb(195, 129, 84);
+  font-weight: bold;
+  text-align: center;
+}
+
+.products p {
+  color: rgb(96, 63, 38);
+  text-align: center;
+}
+
+.product-item {
+  border: 1px solid #ccc; /* Borde de los productos */
+  border-radius: 5px; /* Esquinas redondeadas */
+  padding: 10px; /* Espaciado interno */
+  margin-bottom: 10px; /* Espacio entre productos */
+  background-color: #f9f9f9; /* Color de fondo */
+  transition: background-color 0.3s; /* Transición suave para el hover */
+}
+
+.product-item:hover {
+  background-color: #e0e0e0; /* Color de fondo al pasar el mouse */
+}
+
+/* Sección superior */
+.superior {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+  background-color: rgb(255, 194, 111);
+  color: rgb(136, 74, 57);
+  padding: 15px 0;
+  font-size: 1.5em;
+  font-weight: bold;
+}

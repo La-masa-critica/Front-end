@@ -1,1 +1,7 @@
-/* You can add global styles to this file, and also import other style files */
+body, html {
+    margin: 0; /* Eliminar márgenes en el cuerpo y en HTML */
+    padding: 0; /* Eliminar padding en el cuerpo y en HTML */
+    height: 100%; /* Asegurarse de que el cuerpo ocupe toda la altura */
+    width:100%;
+    background-color: rgb(111, 78, 55);
+  }
