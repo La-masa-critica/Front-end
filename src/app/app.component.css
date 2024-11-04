@@ -61,6 +61,8 @@ h2 {
   margin-bottom: 10px; /* Espacio entre productos */
   background-color: #f9f9f9; /* Color de fondo */
   transition: background-color 0.3s; /* Transición suave para el hover */
+  height:80%;
+  width:80%;
 }
 
 .product-item:hover {
@@ -107,3 +109,18 @@ h2 {
   padding: 10px; /* Espacio interno del botón */
   cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
 }
+
+button {
+  background-color: #007bff; /* Color por defecto */
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+button.in-cart {
+  background-color: #dc3545; /* Color cuando está en el carrito */
+}
+
+
+

@@ -5,31 +5,42 @@ import { Item } from './item.model';
 import { Category } from './category.model';
 import { catchError, of } from 'rxjs';
 import { CartService } from './sale.service';
-import { Cart } from './cart.model';
+import { Cart, Cart2 } from './cart.model';
 import { Sale } from './sale.model';
+
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { waitForAsync } from '@angular/core/testing';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  items: Item[] = [];
+  items: Item[] = []; 
   allItems: Item[] = []; // Lista completa de productos para aplicar el filtro
   categories: Category[] = [];
   selectedCategoryId: number | null = null; // Cambiado a null
   itemIdToShow: Item | null = null; 
-  cart: { item: Item; quantity: number }[] = [];
   minPrice: string = ''; 
   maxPrice: string = '';
-  cart2: Cart = { cartId: 0, items: [] };
   total: number = 0;
+  cartData: Cart | null = null;
+  cartDatawithNames: Cart2 | null = null;
+  profileid: number = 1;
+  cartItems: number[] = [];
+
+
   constructor(private itemService: ItemService, private categoryService: CategoryService,private cartService: CartService) {}
 
   ngOnInit(): void {
     this.loadItems();
     this.loadCategories();
-  }
 
+    this.loadCartwithNames();
+    this.loadCart();
+  }
+  //Carga productos
   loadItems(): void {
     this.itemService.getItems().pipe(
       catchError(error => {
@@ -37,11 +48,11 @@ export class AppComponent implements OnInit {
         return of([]);
       })
     ).subscribe(data => {
-      this.allItems = data; // Carga todos los productos en `allItems`
-      this.items = data; // Muestra todos los productos inicialmente
+      this.allItems = data; 
+      this.items = data; 
     });
   }
-
+  //Carga categorias
   loadCategories(): void {
     this.categoryService.getCategories().pipe(
       catchError(error => {
@@ -52,9 +63,8 @@ export class AppComponent implements OnInit {
       this.categories = data;
     });
   }
-
+  //Define los nuevos productos a mostrar segun categoria
   filterItemsByCategory(): void {
-    // Convertir selectedCategoryId a número
     const categoryId = this.selectedCategoryId ? Number(this.selectedCategoryId) : null;
     
     if (categoryId !== null && categoryId !== 0) {
@@ -62,123 +72,126 @@ export class AppComponent implements OnInit {
         item.categoryList.some(category => category.id === categoryId)
       );
     } else {
-      this.items = this.allItems; // Muestra todos los productos si la categoría es "Todas las categorías" (id 0)
+      this.items = this.allItems; 
     }
   }
 
-  addToCart(item: Item): void {
-    const existingItem = this.cart.find(cartItem => cartItem.item.id === item.id);
-  
-    if (existingItem) {
-      if (existingItem.quantity < item.stock) {
-        existingItem.quantity++; // Incrementa la cantidad si no se ha alcanzado el stock
-      } else {
-        //alert('No puedes añadir más de este producto.'); // O muestra un mensaje al usuario
-      }
-    } else {
-      if (item.stock > 0) {
-        this.cart.push({ item, quantity: 1 }); // Agrega el producto al carrito si hay stock disponible
-      } else {
-        alert('Este producto no está disponible.'); // O muestra un mensaje al usuario
-      }
-    }
-  }
-
-  deleteToCart(item: Item): void {
-    const existingItem = this.cart.find(cartItem => cartItem.item.id === item.id);
-  
-    if (existingItem) {
-      if (existingItem.quantity > 1) {
-        existingItem.quantity--; // Disminuye la cantidad si es mayor que 1
-      } else {
-        this.cart = this.cart.filter(cartItem => cartItem.item.id !== item.id); // Elimina el producto del carrito si la cantidad es 1
-      }
-    }
-  }
-  
-  
-  calculateTotal(): string {
-    const total = this.cart.reduce((total, cartItem) => total + (cartItem.item.price * cartItem.quantity), 0);
-    return total.toFixed(2); // Devuelve el total con 2 decimales
-  }
-  
-  removeFromCart(item: Item): void {
-    this.cart = this.cart.filter(cartItem => cartItem.item.id !== item.id); // Filtra para eliminar el artículo del carrito
-  }
-
-  updateCartItem(cartItem: any): void {
-    if (cartItem.quantity > cartItem.item.stock) {
-      alert('No puedes añadir más de este producto que hay en stock.');
-      cartItem.quantity = cartItem.item.stock; // Restablece a la cantidad máxima en stock
-    }
-  }
-
-  totalAmount(): number {
-    return this.cart.reduce((total, cartItem) => {
-      return total + (cartItem.item.price * cartItem.quantity);
-    }, 0);
-  }
-
-
-  confirmCart(): void {
-    // Calcular total y preparar el objeto de venta
-    const sale: Sale = {
-      id: 0,
-      profileId: 0, // Ajusta según tu lógica
-      date: new Date().toISOString(),
-      status: 'Pending',
-      total: this.totalAmount(), // Usa la función para calcular el total
-      comments: '',
-      saleDetails: this.cart.map(cartItem => ({
-        id: 0,
-        itemId: cartItem.item.id, // Asegúrate de acceder al ID correcto del item
-        quantity: cartItem.quantity,
-        price: cartItem.item.price, // Accede al precio del item
-      })),
-    };
-  
-    // Primero, agrega el carrito
-    this.cartService.addCart(this.cart2).subscribe(() => {
-      // Luego, confirma la venta
-      this.cartService.confirmSale(sale).subscribe(() => {
-        console.log('Carrito confirmado y venta registrada');
-        // Aquí puedes limpiar el carrito o mostrar un mensaje de éxito
-      });
-    });
-  }
-
+  //Filtrar por precios con/sin categoria
   filterItems(): void {
-    // Configura los parámetros para el filtro
+    
     let categoryIds: number[]  | undefined;
 
-    // Si se selecciona una categoría válida, la agregamos a categoryIds
+    
     if (this.selectedCategoryId && this.selectedCategoryId != 0) {
-        categoryIds = [this.selectedCategoryId]; //Si escogio categoria y es distinto a id 0 hace esto
+        categoryIds = [this.selectedCategoryId]; 
     } else {
-        // Si selectedCategoryId es 0 o no está definido, obtenemos todas las categorías
+        
         categoryIds = undefined;
     }
     
-    // Procesamos los precios
-    const minPrice = this.minPrice ? parseFloat(this.minPrice) : undefined; // Cambiamos a undefined
-    const maxPrice = this.maxPrice ? parseFloat(this.maxPrice) : undefined; // Cambiamos a undefined
+    
+    const minPrice = this.minPrice ? parseFloat(this.minPrice) : undefined; 
+    const maxPrice = this.maxPrice ? parseFloat(this.maxPrice) : undefined; 
     console.log(minPrice);
     console.log(maxPrice);
     console.log(categoryIds);
     console.log(this.categories.map(category => category.id));
-    // Llama a `filterItems` en `itemService`, pasando los parámetros necesarios
+    
     this.itemService.filterItems(categoryIds, minPrice, maxPrice).subscribe(filteredItems => {
-        // Comprobamos si no hay productos filtrados
         if (filteredItems.length === 0) {
             console.log('No se encontraron productos con los filtros aplicados.');
         }
-        this.items = filteredItems; // Actualiza la lista de productos mostrada
+        this.items = filteredItems; 
     });
+}
+//LOGICA DEL CARRITO A PARTIR DE AQUI
+loadCart(): void {
+  this.cartService.getCartByProfileId(this.profileid).subscribe(cartDatafound => {
+    this.cartData = cartDatafound;
+    console.log(this.cartData);
+  });
+  this.loadCartwithNames();
+}
+
+  
+loadCartwithNames(): void{
+  console.log(this.items);
+  let carritowithname: Cart2 = this.cartData as Cart2;
+  carritowithname?.items.forEach(element => {
+    console.log(element.itemId);
+    element.name = this.items.find(item => item.id === element.itemId)?.name;
+    console.log(element.itemId);
+  });
+  this.cartDatawithNames = carritowithname;
+}
+//Agregar elemento al carrito
+addToCart(itemId: number): void {
+    
+    this.cartService.addCart(this.profileid, itemId, 1).subscribe(
+      cart => { console.log(cart);
+        this.cartData = cart;
+      }
+    );
+    this.loadCartwithNames();
+  } 
+
+  eliminateToCart(itemId: number): void {
+    
+    this.cartService.removeFromCart(this.profileid, itemId).subscribe(() => {});
+    this.actualizar();
+    this.loadCartwithNames();
+  }
+
+
+
+isInCart(itemId: number): boolean {
+  return this.cartItems.includes(itemId);
+}
+
+async updateCartAndLoad(item: { itemId: number; quantity: number }) {
+  
+  await this.cartService.updateCartQuantity(this.profileid, item.itemId, item.quantity);
+
+  
+  setTimeout(() => {
+    this.loadCart();
+  }, 1000); // 500 ms de retraso
+}
+
+async actualizar() {
+  setTimeout(() => {
+    this.loadCart();
+  }, 1000); // 500 ms de retraso
 }
 
 
 
-  
+increaseQuantity(item: { itemId: number; quantity: number }): void {
+  let item2: Item = this.items[item.itemId];
+  if (item2.stock==item.quantity){return}
+  item.quantity += 1;
+  this.cartService.updateCartQuantity(this.profileid, item.itemId, item.quantity).subscribe(
+    response => {
+      console.log(response);
 
-  
+    });
+  this.updateCartAndLoad(item);
+  this.loadCartwithNames();
+}
+
+decreaseQuantity(item: { itemId: number; quantity: number }): void {
+  if (item.quantity < 1){return}
+    item.quantity -= 1;
+    this.cartService.updateCartQuantity(this.profileid, item.itemId, item.quantity).subscribe(() => {}) ;
+    this.updateCartAndLoad(item);
+    this.loadCartwithNames();
+}
+
+updateQuantity(item: { itemId: number; quantity: number }): void {
+  this.cartService.updateCartQuantity(this.profileid, item.itemId, item.quantity).subscribe(() => {});
+  this.updateCartAndLoad(item);
+  this.loadCartwithNames();
+}
+
+
 }

@@ -28,22 +28,30 @@
       <h3>{{ item.name }}</h3>
       <p>Precio: {{ item.price }} </p>
       <p>Cantidad: {{ item.stock }}</p>
-      <button (click)="addToCart(item)">Agregar al carrito</button>
-      <button (click)="deleteToCart(item)">Eliminar del carrito</button>
+      <button (click)="addToCart(item.id)" >
+        Agregar al carrito
+    </button>
+    <button (click)="eliminateToCart(item.id)" >
+      Eliminar al carrito
+  </button>
     </div>
   </div>
 
   <div class="cart">
-    <h2>Carrito</h2>
-    <div *ngFor="let cartItem of cart">
-      <h3>{{ cartItem.item.name }}</h3>
-      <p>Precio: {{ cartItem.item.price | number: '1.2-2' }}</p>
-      <p>Cantidad:
-        <input type="number" [(ngModel)]="cartItem.quantity" (change)="updateCartItem(cartItem)" min="1" max="{{ cartItem.item.stock }}">
-      </p>
-      <button (click)="removeFromCart(cartItem.item)">Eliminar del carrito</button>
+    <div *ngIf="cartData">
+      <h2>Carrito ID: </h2>
+      <h3>Productos en el Carrito:</h3>
+      <ul>
+        <li *ngFor="let item of cartData.items">
+          Producto: {{ item.itemId }} - Cantidad: {{ item.quantity }}
+          Cantidad: 
+          <button (click)="decreaseQuantity(item)">-</button>
+          <input type="number" [(ngModel)]="item.quantity" (change)="updateQuantity(item)" min="1" />
+          <button (click)="increaseQuantity(item)">+</button>
+        </li>
+      </ul>
     </div>
-    <h3>Total: {{ totalAmount() | number: '1.2-2' }}</h3>
-    <button (click)="confirmCart()" style="width: 100%;">Proceder al checkout</button>
-  </div>
+    <div *ngIf="!cartData">
+      <p>No se ha encontrado el carrito.</p>
+    </div>
 </div>

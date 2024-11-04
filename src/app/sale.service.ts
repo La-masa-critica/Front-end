@@ -1,22 +1,49 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Cart } from './cart.model';
+import { Cart, CartItem } from './cart.model';
 import { Sale } from './sale.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
-  private apiUrl = 'http://localhost:8082/api/v1';
+  private apiUrl = 'http://localhost:8081/api/v1';
 
   constructor(private http: HttpClient) {}
 
-  addCart(cart: Cart): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/cart/add`, cart);
+  addCart(cartId: number, itemId: number, quantity: number): Observable<Cart> {
+    const body = {
+      cartId: cartId,
+      itemId: itemId,
+      quantity: quantity
+    };
+    console.log(body);
+    return this.http.post<Cart>(`${this.apiUrl}/cart/add`, body);
   }
 
-  confirmSale(sale: Sale): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/sell/confirm`, sale);
+  removeFromCart(profileId: number, itemId: number): Observable<Cart> {
+    const params = { profileId: profileId, itemId: itemId };
+     return this.http.delete<Cart>(`${this.apiUrl}/cart/delete`, { params });
+  }
+
+  getCartByProfileId(profileId: number): Observable<Cart> {
+    const url = `${this.apiUrl}/cart/${profileId}`;
+    return this.http.get<Cart>(url);
+  }
+
+  updateCartQuantity(profileId: number, itemId: number, quantity: number): Observable<CartItem> {
+    const headers = new HttpHeaders({
+      'Accept': '/'
+    });
+    console.log("Yo estuve aqui");
+    // Parámetros de consulta
+    const params = new HttpParams()
+      .set('profileId', profileId)
+      .set('itemId', itemId)
+      .set('quantity', quantity);
+
+    // Realizar la solicitud PUT
+    return this.http.put<CartItem>(`${this.apiUrl}/cart/update`, null, { headers, params });
   }
 }
