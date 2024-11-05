@@ -8,9 +8,11 @@ import { CartService } from './sale.service';
   styleUrls: ['./checkout.component.css']
 })
 export class CheckoutComponent {
-    profileid: number = 3;
+    profileid: number = 1;
     checkoutData: Checkout | null = null;
-  constructor(private router: Router, private cartService: CartService) {}
+  constructor(private router: Router, private cartService: CartService) {
+
+  }
 
   ngOnInit(): void {
     this.loadcheckout();
@@ -18,15 +20,21 @@ export class CheckoutComponent {
 
   confirmPurchase(): void {
 
-    this.cartService.confirmSale(this.profileid).subscribe(  () => {}  );
+    this.cartService.confirmSale(this.checkoutData?.id).subscribe(  (sale: Checkout) => {
+        this.checkoutData = sale;
+    }  );
     // Aquí puedes añadir la lógica para enviar la información del pedido al backend
     alert('Compra confirmada');
-    this.router.navigate(['/']); // Redirige al usuario a la página principal o donde desees
+    this.router.navigate(['/']).then(() => {
+        this.router.navigateByUrl(this.router.url); // Esto volverá a cargar el componente sin recargar toda la página
+      });
   }
 
 
   cancelPurchase(): void {
-    this.cartService.cancelSale(this.profileid).subscribe(  () => {}  );
+    this.cartService.cancelSale(this.checkoutData?.id).subscribe(  (sale: Checkout) => {
+        this.checkoutData = sale;
+    }  );
     alert('Compra cancelada');
     this.router.navigate(['/']); // Redirige al usuario de nuevo al carrito
   }

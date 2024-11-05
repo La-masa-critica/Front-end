@@ -52,8 +52,12 @@ export class CartService {
     return this.http.post<Checkout>(`${this.apiUrl}/sale/checkout`, {}, { params });
   }
 
-  confirmSale(saleId: number): Observable<Checkout> {
-    const params = new HttpParams().set('saleId', 2);
+  confirmSale(saleId: number | undefined): Observable<Checkout> {
+    if (saleId==undefined){
+      throw new Error("The saleId cannot be undefined");
+      
+    }
+    const params = new HttpParams().set('saleId', saleId);
     const headers = new HttpHeaders({
       'Accept': '/'
     });
@@ -61,8 +65,12 @@ export class CartService {
     return this.http.put<Checkout>(`${this.apiUrl}/sale/confirm`,null ,{ headers, params });
   }
 
-  cancelSale(saleId: number): Observable<Checkout> {
-    const params = new HttpParams().set('saleId', 2);
+  cancelSale(saleId: number | undefined): Observable<Checkout> {
+    if (saleId==undefined){
+      throw new Error("The saleId cannot be undefined");
+      
+    }
+    const params = new HttpParams().set('saleId', saleId);
     const headers = new HttpHeaders({
       'Accept': '/'
     });
