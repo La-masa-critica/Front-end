@@ -3,6 +3,7 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Cart, CartItem } from './cart.model';
 import { Sale } from './sale.model';
+import { Checkout } from './checkout.model';
 
 @Injectable({
   providedIn: 'root'
@@ -45,5 +46,22 @@ export class CartService {
 
     // Realizar la solicitud PUT
     return this.http.put<CartItem>(`${this.apiUrl}/cart/update`, null, { headers, params });
+  }
+
+  checkout(cartId: number): Observable<Checkout> {
+    const params = new HttpParams().set('cartId', cartId);
+    return this.http.post<Checkout>(`${this.apiUrl}/sale/checkout`, {}, { params });
+  }
+
+  confirmSale(saleId: number): Observable<Checkout> {
+    const params = new HttpParams().set('saleId', saleId.toString());
+    
+    return this.http.put<Checkout>(`${this.apiUrl}/sale/confirm`, { params });
+  }
+
+  cancelSale(saleId: number): Observable<Checkout> {
+    const params = new HttpParams().set('saleId', saleId.toString());
+    
+    return this.http.put<Checkout>(`${this.apiUrl}/sale/cancel`, { params });
   }
 }

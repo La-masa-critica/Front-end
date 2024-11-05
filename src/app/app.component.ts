@@ -6,11 +6,7 @@ import { Category } from './category.model';
 import { catchError, of } from 'rxjs';
 import { CartService } from './sale.service';
 import { Cart, Cart2 } from './cart.model';
-import { Sale } from './sale.model';
-
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
-import { waitForAsync } from '@angular/core/testing';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -31,7 +27,7 @@ export class AppComponent implements OnInit {
   cartItems: number[] = [];
 
 
-  constructor(private itemService: ItemService, private categoryService: CategoryService,private cartService: CartService) {}
+  constructor(private itemService: ItemService, private categoryService: CategoryService,private cartService: CartService, public router: Router) {}
 
   ngOnInit(): void {
     this.loadItems();
@@ -155,28 +151,23 @@ async updateCartAndLoad(item: { itemId: number; quantity: number }) {
   
   setTimeout(() => {
     this.loadCart();
-  }, 1000); // 500 ms de retraso
+    this.loadCartwithNames();
+  }, 100); // 500 ms de retraso
 }
 
 async actualizar() {
   setTimeout(() => {
     this.loadCart();
-  }, 1000); // 500 ms de retraso
+  }, 100); // 500 ms de retraso
 }
 
 
 
 increaseQuantity(item: { itemId: number; quantity: number }): void {
-  let item2: Item = this.items[item.itemId];
-  if (item2.stock==item.quantity){return}
   item.quantity += 1;
-  this.cartService.updateCartQuantity(this.profileid, item.itemId, item.quantity).subscribe(
-    response => {
-      console.log(response);
-
-    });
-  this.updateCartAndLoad(item);
-  this.loadCartwithNames();
+    this.cartService.updateCartQuantity(this.profileid, item.itemId, item.quantity).subscribe(() => {}) ;
+    this.updateCartAndLoad(item);
+    this.loadCartwithNames();
 }
 
 decreaseQuantity(item: { itemId: number; quantity: number }): void {
@@ -191,6 +182,10 @@ updateQuantity(item: { itemId: number; quantity: number }): void {
   this.cartService.updateCartQuantity(this.profileid, item.itemId, item.quantity).subscribe(() => {});
   this.updateCartAndLoad(item);
   this.loadCartwithNames();
+}
+
+goToCheckout(): void {
+  this.router.navigate(['/checkout']);
 }
 
 
