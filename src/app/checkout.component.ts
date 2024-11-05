@@ -8,7 +8,7 @@ import { CartService } from './sale.service';
   styleUrls: ['./checkout.component.css']
 })
 export class CheckoutComponent {
-    profileid: number = 1;
+    profileid: number = 3;
     checkoutData: Checkout | null = null;
   constructor(private router: Router, private cartService: CartService) {}
 

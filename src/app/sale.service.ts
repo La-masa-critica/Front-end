@@ -37,7 +37,6 @@ export class CartService {
     const headers = new HttpHeaders({
       'Accept': '/'
     });
-    console.log("Yo estuve aqui");
     // Parámetros de consulta
     const params = new HttpParams()
       .set('profileId', profileId)
@@ -54,14 +53,20 @@ export class CartService {
   }
 
   confirmSale(saleId: number): Observable<Checkout> {
-    const params = new HttpParams().set('saleId', saleId.toString());
+    const params = new HttpParams().set('saleId', 2);
+    const headers = new HttpHeaders({
+      'Accept': '/'
+    });
     
-    return this.http.put<Checkout>(`${this.apiUrl}/sale/confirm`, { params });
+    return this.http.put<Checkout>(`${this.apiUrl}/sale/confirm`,null ,{ headers, params });
   }
 
   cancelSale(saleId: number): Observable<Checkout> {
-    const params = new HttpParams().set('saleId', saleId.toString());
+    const params = new HttpParams().set('saleId', 2);
+    const headers = new HttpHeaders({
+      'Accept': '/'
+    });
     
-    return this.http.put<Checkout>(`${this.apiUrl}/sale/cancel`, { params });
+    return this.http.put<Checkout>(`${this.apiUrl}/sale/cancel`, null,{ headers,params });
   }
 }
