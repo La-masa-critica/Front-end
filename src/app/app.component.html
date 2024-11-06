@@ -31,7 +31,7 @@
         <p>Precio: {{ item.price }} </p>
         <p>Cantidad: {{ item.stock }}</p>
         <button (click)="addToCart(item.id)">Agregar al carrito</button>
-        <button (click)="eliminateToCart(item.id)">Eliminar del carrito</button>
+
       </div>
     </div>
 
@@ -40,10 +40,11 @@
         <h3>Productos en el Carrito:</h3>
         <ul>
           <li *ngFor="let item of cartData.items">
-            Producto: {{ item.itemId }} - Cantidad: {{ item.quantity }}
+            Producto: {{ item.name }} - Cantidad: {{ item.quantity }}
             <button (click)="decreaseQuantity(item)">-</button>
             <input type="number" [(ngModel)]="item.quantity" (change)="updateQuantity(item)" min="1" />
             <button (click)="increaseQuantity(item)">+</button>
+            <button (click)="eliminateToCart(item.itemId)">Eliminar del carrito</button>
           </li>
         </ul>
       </div>
