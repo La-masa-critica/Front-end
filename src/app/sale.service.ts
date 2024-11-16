@@ -11,7 +11,7 @@ import { environment } from '../envitoment';
 })
 export class SaleService {
   private readonly apiUrl = environment.apiUrl;
-  private updateQuantitySubject = new Subject<{ profileId: number, itemId: number, quantity: number }>();
+  private readonly updateQuantitySubject = new Subject<{ profileId: number, itemId: number, quantity: number }>();
   private updateTimes = 0;
 
   constructor(private readonly http: HttpClient) {
