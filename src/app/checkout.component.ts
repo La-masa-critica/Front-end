@@ -1,49 +1,76 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Checkout } from './checkout.model';
-import { CartService } from './sale.service';
+import { Sale } from './sale.model';
+import { SaleService } from './sale.service';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { environment } from '../envitoment';
+
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
-  styleUrls: ['./checkout.component.css']
 })
-export class CheckoutComponent {
+export class CheckoutComponent implements OnInit {
   profileid: number = 1;
-  checkoutData: Checkout | null = null;
-  constructor(private router: Router, private cartService: CartService) {
+  checkoutData: Sale | null = null;
 
-  }
+  constructor(
+    private readonly router: Router,
+    private readonly saleService: SaleService
+  ) {}
 
   ngOnInit(): void {
+    console.log('CheckoutComponent initialized');
     this.loadcheckout();
   }
 
   confirmPurchase(): void {
-
-    this.cartService.confirmSale(this.checkoutData?.id).subscribe((sale: Checkout) => {
-      this.checkoutData = sale;
-    });
-    // Aquí puedes añadir la lógica para enviar la información del pedido al backend
-    alert('Compra confirmada');
-    this.router.navigate(['/']).then(() => {
-      this.router.navigateByUrl(this.router.url); // Esto volverá a cargar el componente sin recargar toda la página
-    });
+    this.saleService
+      .confirmSale(this.checkoutData?.id)
+      .pipe(
+        catchError((error) => {
+          console.error('Error confirming purchase:', error);
+          return of(null);
+        })
+      )
+      .subscribe((sale: Sale | null) => {
+        if (sale) {
+          this.checkoutData = sale;
+          console.log('Purchase confirmed:', sale);
+          alert('Compra confirmada');
+          this.router.navigate(['/']);
+        } else {
+          console.error('Error: Sale is null');
+        }
+      });
   }
 
-
   cancelPurchase(): void {
-    this.cartService.cancelSale(this.checkoutData?.id).subscribe((sale: Checkout) => {
-      this.checkoutData = sale;
-    });
-    alert('Compra cancelada');
-    this.router.navigate(['/']); // Redirige al usuario de nuevo al carrito
+    this.saleService
+      .cancelSale(this.checkoutData?.id)
+      .pipe(
+        catchError((error) => {
+          console.error('Error canceling purchase:', error);
+          return of(null);
+        })
+      )
+      .subscribe((sale: Sale | null) => {
+        if (sale) {
+          this.checkoutData = sale;
+          alert('Compra cancelada');
+          this.router.navigate(['/']);
+        }
+      });
   }
 
   loadcheckout(): void {
-    this.cartService.checkout(this.profileid).subscribe(
-      (checkout: Checkout) => {
-        this.checkoutData = checkout; // Asigna el objeto Checkout a checkoutdata
-      }
-    );
+    console.log('loadcheckout called');
+    this.checkoutData = environment.currentSale; // Read the sale from environment.currentSale
+    if (!this.checkoutData) {
+      alert('No hay compra en proceso');
+      this.router.navigate(['/']);
+    } else {
+      console.log('Checkout data:', this.checkoutData);
+    }
   }
 }

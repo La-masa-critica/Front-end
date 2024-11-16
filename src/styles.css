@@ -3,5 +3,5 @@ body, html {
     padding: 0; /* Eliminar padding en el cuerpo y en HTML */
     height: 100%; /* Asegurarse de que el cuerpo ocupe toda la altura */
     width:100%;
-    background-color: rgb(111, 78, 55);
+    /* background-color: rgb(111, 78, 55); */
   }

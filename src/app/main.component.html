@@ -1,0 +1,109 @@
+<div class="bg-gray-200 min-h-screen">
+  <nav class="bg-indigo-600 p-4 text-white flex justify-between items-center fixed top-0 left-0 transition-all duration-300" [ngClass]="{'w-4/5': isCartOpen, 'w-full': !isCartOpen}">
+    <div class="text-lg">Navbar</div>
+    <button (click)="toggleCart()" class="bg-indigo-800 p-2 rounded hover:bg-indigo-700">
+      Carrito ({{ cartData?.items?.length || 0 }})
+    </button>
+  </nav>
+
+  <div class="container p-5 flex mt-16">
+    <div class="filters w-1/4 p-4 shadow-md rounded bg-indigo-100">
+      <h2 class="mb-4 text-indigo-800">Filtros</h2>
+      <!-- Filtro por categoría -->
+      <label for="category" class="font-bold block mt-2 text-indigo-700">Seleccionar categorías:</label>
+      <select id="category" multiple (change)="addCategory($event)" class="w-full p-2 mt-1 border border-indigo-300 rounded bg-white">
+        <option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</option>
+      </select>
+      <div class="selected-categories mt-2">
+        <span *ngFor="let category of selectedCategories" class="tag bg-indigo-600 text-white p-1 rounded mr-1">
+          {{ category.name }}
+          <button (click)="removeCategory(category.id)" class="ml-1 text-red-500">x</button>
+        </span>
+      </div>
+
+      <!-- Filtros por precio -->
+      <label for="minPrice" class="font-bold block mt-2 text-indigo-700">Precio mínimo:</label>
+      <input type="number" id="minPrice" [(ngModel)]="minPrice" (change)="filterItems()" class="w-full p-2 mt-1 border border-indigo-300 rounded bg-white" />
+
+      <label for="maxPrice" class="font-bold block mt-2 text-indigo-700">Precio máximo:</label>
+      <input type="number" id="maxPrice" [(ngModel)]="maxPrice" (change)="filterItems()" class="w-full p-2 mt-1 border border-indigo-300 rounded bg-white" />
+
+      <button (click)="filterItems()" class="mt-4 w-full p-2 text-lg bg-indigo-600 text-white rounded hover:bg-indigo-500">Aplicar Filtros</button>
+    </div>
+
+    <div class="products flex-1 p-4 shadow-md rounded bg-indigo-100 ml-4">
+      <h2 class="text-indigo-800">Productos</h2>
+      <div *ngFor="let item of items" class="product-item border p-4 mb-4 rounded bg-white shadow-lg flex">
+        <img src="../assets/pan.jpg" alt="Bread" class="w-24 h-24 mr-4 rounded">
+        <div class="flex-1">
+          <h3 class="font-bold text-lg text-indigo-800">{{ item.name }}</h3>
+          <p class="text-indigo-700">Precio: {{ item.price }}</p>
+          <p class="text-indigo-700">Cantidad: {{ item.stock }}</p>
+          <div class="mt-2 flex justify-center">
+            <button (click)="addToCart(item.id)" class="bg-indigo-600 text-white p-2 rounded hover:bg-indigo-500">Agregar al carrito</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isCartOpen" class="cart bg-white shadow-lg fixed top-0 right-0 h-full w-1/5 p-4 transition-transform duration-300 transform translate-x-0 flex flex-col">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-bold text-indigo-800">Carrito</h2>
+      <button (click)="emptyCart()" class="bg-red-500 text-white p-2 rounded hover:bg-red-400">Vaciar</button>
+    </div>
+    <div class="flex-1 overflow-y-auto">
+      <div *ngIf="cartData?.items?.length; else emptyCartTemplate">
+        <div *ngFor="let item of cartData?.items" class="cart-item mb-4 p-4 bg-indigo-100 rounded-lg shadow-md flex">
+          <img src="../assets/pan.jpg" alt="Bread" class="w-16 h-16 mr-4 rounded">
+          <div class="flex-1">
+            <h3 class="font-bold text-lg text-indigo-800">{{ item.name }}</h3>
+            <p class="text-indigo-700">Precio: {{ item.price }}</p>
+            <div class="flex justify-center items-center mt-2 space-x-2">
+              <button (click)="decreaseQuantity(item)" class="bg-red-500 text-white p-2 rounded hover:bg-red-400 w-8 h-8 flex items-center justify-center">-</button>
+              <span class="mx-2">{{ item.quantity }}</span>
+              <button (click)="increaseQuantity(item)" class="bg-green-500 text-white p-2 rounded hover:bg-green-400 w-8 h-8 flex items-center justify-center">+</button>
+            </div>
+            <div class="mt-2 flex justify-center">
+              <button (click)="eliminateToCart(item.itemId)" class="bg-red-500 text-white p-2 rounded hover:bg-red-400 w-24">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #emptyCartTemplate>
+        <p class="text-indigo-800">El carrito está vacío.</p>
+      </ng-template>
+    </div>
+    <button (click)="goToCheckout()" class="w-full p-2 bg-indigo-600 text-white rounded hover:bg-indigo-500 mt-4">Ir al Checkout</button>
+  </div>
+
+  <div *ngIf="!isCartOpen" class="cart bg-white shadow-lg fixed top-0 right-0 h-full w-1/5 p-4 transition-transform duration-300 transform translate-x-full flex flex-col">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-bold text-indigo-800">Carrito</h2>
+      <button (click)="emptyCart()" class="bg-red-500 text-white p-2 rounded hover:bg-red-400">Vaciar</button>
+    </div>
+    <div class="flex-1 overflow-y-auto">
+      <div *ngIf="cartData?.items?.length; else emptyCartTemplate">
+        <div *ngFor="let item of cartData?.items" class="cart-item mb-4 p-4 bg-indigo-100 rounded-lg shadow-md flex">
+          <img src="../assets/pan.jpg" alt="Bread" class="w-16 h-16 mr-4 rounded">
+          <div class="flex-1">
+            <h3 class="font-bold text-lg text-indigo-800">{{ item.name }}</h3>
+            <p class="text-indigo-700">Precio: {{ item.price }}</p>
+            <div class="flex justify-center items-center mt-2 space-x-2">
+              <button (click)="decreaseQuantity(item)" class="bg-red-500 text-white p-2 rounded hover:bg-red-400 w-8 h-8 flex items-center justify-center">-</button>
+              <span class="mx-2">{{ item.quantity }}</span>
+              <button (click)="increaseQuantity(item)" class="bg-green-500 text-white p-2 rounded hover:bg-green-400 w-8 h-8 flex items-center justify-center">+</button>
+            </div>
+            <div class="mt-2 flex justify-center">
+              <button (click)="eliminateToCart(item.itemId)" class="bg-red-500 text-white p-2 rounded hover:bg-red-400 w-24">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #emptyCartTemplate>
+        <p class="text-indigo-800">El carrito está vacío.</p>
+      </ng-template>
+    </div>
+    <button (click)="goToCheckout()" class="w-full p-2 bg-indigo-600 text-white rounded hover:bg-indigo-500 mt-4">Ir al Checkout</button>
+  </div>
+</div>
