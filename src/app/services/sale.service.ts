@@ -42,7 +42,7 @@ export class SaleService {
     }
     const params = new HttpParams().set('saleId', saleId);
     const headers = new HttpHeaders({
-      Accept: 'application/json', // Fix typo from 'aaplication/json'
+      Accept: 'application/json',
     });
 
     return this.http.put<Sale>(`${this.apiUrl}/cancel`, null, {
@@ -56,7 +56,6 @@ export class SaleService {
   }
 
   getSaleByProfileId(profileId: number): Observable<Sale[]> {
-    // TODO: Fix the backend to pass the profileId as a query parameter
     const params = new HttpParams().set('profileId', profileId);
     return this.http.get<Sale[]>(`${this.apiUrl}`, { params });
   }

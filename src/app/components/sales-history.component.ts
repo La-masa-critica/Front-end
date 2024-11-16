@@ -28,7 +28,7 @@ export class SalesHistoryComponent implements OnInit {
     this.saleService.getSaleByProfileId(this.profileId).subscribe({
       next: (sales) => {
         this.sales.set(
-          sales.sort((a, b) => {
+          sales.toSorted((a, b) => {
             return new Date(b.date).getTime() - new Date(a.date).getTime();
           })
         );

@@ -12,11 +12,10 @@ import { Category } from '../models/category.model';
 import { catchError, of } from 'rxjs';
 import { SaleService } from '../services/sale.service';
 import { CartService } from '../services/cart.service';
-import { Cart } from '../models/cart.model';
 import { Sale } from '../models/sale.model';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
+import { DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CartStateService } from '../services/cart-state.service';
 
@@ -24,7 +23,7 @@ import { CartStateService } from '../services/cart-state.service';
   selector: 'app-main',
   templateUrl: './main.component.html',
   standalone: true,
-  imports: [FormsModule, DecimalPipe, NgOptimizedImage, NgClass],
+  imports: [FormsModule, DecimalPipe, NgOptimizedImage],
   providers: [ItemService, CategoryService, SaleService, CartService],
 })
 export class MainComponent implements OnInit {

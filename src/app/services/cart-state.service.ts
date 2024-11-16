@@ -12,7 +12,7 @@ export class CartStateService {
 
   cartItemCount = computed(() => this.cartData()?.items?.length ?? 0);
 
-  constructor(private router: Router) {
+  constructor(private readonly router: Router) {
     // Close cart on route changes
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
