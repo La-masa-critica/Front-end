@@ -1,22 +1,19 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
+import { provideHttpClient } from '@angular/common/http';
+// import { AppRoutingModule } from './app-routing.module';
 import { FormsModule } from '@angular/forms';
-import { MainComponent } from './main.component';
-import { CheckoutComponent } from './checkout.component';
+import { RouterModule } from '@angular/router';
 import { SaleService } from './sale.service';
 
 @NgModule({
-  declarations: [AppComponent, MainComponent, CheckoutComponent],
   imports: [
     BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
+    // AppRoutingModule,
     FormsModule,
+    RouterModule
   ],
-  providers: [SaleService],
-  bootstrap: [AppComponent],
+  providers: [SaleService, provideHttpClient()],
+  // bootstrap: [AppComponent]
 })
 export class AppModule {}

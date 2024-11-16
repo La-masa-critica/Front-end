@@ -1,40 +1,63 @@
-import { Component, OnInit } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  signal,
+  computed,
+  WritableSignal,
+} from '@angular/core';
 import { ItemService } from './item.service';
 import { CategoryService } from './category.service';
 import { Item } from './item.model';
 import { Category } from './category.model';
 import { catchError, of } from 'rxjs';
 import { SaleService } from './sale.service';
+import { CartService } from './cart.service';
 import { Cart } from './cart.model';
 import { Sale } from './sale.model';
 import { Router } from '@angular/router';
-import { environment } from '../envitoment';
+import { environment } from '../environments/environment';
+import {
+  DecimalPipe,
+  NgClass,
+  NgOptimizedImage,
+} from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { CartStateService } from './cart-state.service';
 
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
+  standalone: true,
+  imports: [FormsModule, DecimalPipe, NgOptimizedImage, NgClass],
+  providers: [ItemService, CategoryService, SaleService, CartService]
 })
 export class MainComponent implements OnInit {
-  readonly title = 'my-project';
-  items: Item[] = [];
-  allItems: Item[] = []; // Lista completa de productos para aplicar el filtro
-  categories: Category[] = [];
-  selectedCategories: Category[] = []; // Changed to an array of categories
-  itemIdToShow: Item | null = null;
+  items: WritableSignal<Item[]> = signal([]);
+  categories: WritableSignal<Category[]> = signal([]);
+  selectedCategories: WritableSignal<Category[]> = signal([]);
+  isLoading = signal(false);
+
+  total = computed(() => {
+    return (
+      this.cartState.cartData()?.items.reduce((acc, item) => {
+        return acc + (item.price ?? 0) * item.quantity;
+      }, 0) ?? 0
+    );
+  });
+
   minPrice: string = '';
   maxPrice: string = '';
-  total: number = 0;
-  cartData: Cart | null = null;
   readonly profileid: number = 1;
-  cartItems: number[] = [];
-  isCartOpen: boolean = false;
+  allItems: Item[] = [];
   currentSale: Sale | null = null;
 
   constructor(
     private readonly itemService: ItemService,
     private readonly categoryService: CategoryService,
     private readonly saleService: SaleService,
-    public readonly router: Router
+    private readonly cartService: CartService,
+    public readonly router: Router,
+    public readonly cartState: CartStateService
   ) {}
 
   ngOnInit(): void {
@@ -54,9 +77,9 @@ export class MainComponent implements OnInit {
         })
       )
       .subscribe((data) => {
-        this.allItems = data;
-        this.items = data;
-        this.items.sort((item1, item2) => item1.id - item2.id);
+        const sortedData = data.sort((a, b) => a.id - b.id);
+        this.items.set(sortedData);
+        this.allItems = sortedData; // Save copy for filtering
         this.cartLoadNamesAndPrice(); // Ensure names are loaded after items are loaded
       });
   }
@@ -72,23 +95,25 @@ export class MainComponent implements OnInit {
         })
       )
       .subscribe((data) => {
-        this.categories = data;
+        this.categories.set(data);
       });
   }
 
   // Define los nuevos productos a mostrar según categorías
   filterItemsByCategory(): void {
-    const selectedCategoryIds = this.selectedCategories.map(
+    const selectedCategoryIds = this.selectedCategories().map(
       (category) => category.id
     );
     if (selectedCategoryIds.length > 0) {
-      this.items = this.allItems.filter((item) =>
-        item.categoryList.some((category) =>
-          selectedCategoryIds.includes(category.id)
+      this.items.set(
+        this.allItems.filter((item) =>
+          item.categoryList.some((category) =>
+            selectedCategoryIds.includes(category.id)
+          )
         )
       );
     } else {
-      this.items = this.allItems;
+      this.items.set(this.allItems);
     }
     this.cartLoadNamesAndPrice();
   }
@@ -96,38 +121,38 @@ export class MainComponent implements OnInit {
   addCategory(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
     const categoryId = Number(selectElement.value);
-    const selectedCategory = this.categories.find(
+    const selectedCategory = this.categories().find(
       (category) => category.id === categoryId
     );
     if (
       selectedCategory &&
-      !this.selectedCategories.includes(selectedCategory)
+      !this.selectedCategories().includes(selectedCategory)
     ) {
-      this.selectedCategories.push(selectedCategory);
-      this.categories = this.categories.filter(
-        (category) => category.id !== categoryId
+      this.selectedCategories.update((cats) => [...cats, selectedCategory]);
+      this.categories.update((cats) =>
+        cats.filter((category) => category.id !== categoryId)
       );
     }
   }
 
   removeCategory(id: number): void {
-    this.selectedCategories = this.selectedCategories.filter(
-      (category) => category.id !== id
+    this.selectedCategories.update((cats) =>
+      cats.filter((category) => category.id !== id)
     );
     const removedCategory = this.allItems
       .flatMap((item) => item.categoryList)
       .find((category) => category.id === id);
     if (removedCategory) {
-      this.categories.push(removedCategory);
+      this.categories.update((cats) => [...cats, removedCategory]);
     }
-    // Do not call filterItemsByCategory here to avoid updating the items
+    this.filterItemsByCategory(); // Add this line to update filtered items
   }
 
   //Filtrar por precios con/sin categorias
   filterItems(): void {
     const categoryIds =
-      this.selectedCategories.length > 0
-        ? this.selectedCategories.map((category) => category.id)
+      this.selectedCategories().length > 0
+        ? this.selectedCategories().map((category) => category.id)
         : undefined;
 
     const minPrice = this.minPrice ? parseFloat(this.minPrice) : undefined;
@@ -135,7 +160,7 @@ export class MainComponent implements OnInit {
     console.log(minPrice);
     console.log(maxPrice);
     console.log(categoryIds);
-    console.log(this.categories.map((category) => category.id));
+    console.log(this.categories().map((category) => category.id));
 
     this.itemService
       .filterItems(categoryIds, minPrice, maxPrice)
@@ -149,14 +174,14 @@ export class MainComponent implements OnInit {
         if (filteredItems.length === 0) {
           console.log('No se encontraron productos con los filtros aplicados.');
         }
-        this.items = filteredItems;
+        this.items.set(filteredItems);
       });
     this.cartLoadNamesAndPrice();
   }
 
   //LOGICA DEL CARRITO A PARTIR DE AQUI
   loadCart(): void {
-    this.saleService
+    this.cartService
       .getCartByProfileId(this.profileid)
       .pipe(
         catchError((error) => {
@@ -164,104 +189,169 @@ export class MainComponent implements OnInit {
           return of(null);
         })
       )
-      .subscribe((cartDatafound) => {
-        if (cartDatafound) {
-          this.cartData = cartDatafound;
+      .subscribe((cartDataFound) => {
+        if (cartDataFound) {
+          // Sort items by itemId before setting cart data
+          if (cartDataFound.items) {
+            cartDataFound.items.sort((a, b) => a.itemId - b.itemId);
+          }
+          this.cartState.cartData.set(cartDataFound);
           this.cartLoadNamesAndPrice(); // Ensure names are loaded after cart is loaded
-          if (this.cartData.items.length > 0) {
-            this.isCartOpen = true; // Open the cart if there are items
+          if ((cartDataFound?.items?.length ?? 0) > 0) {
+            this.cartState.isCartOpen.set(true); // Open the cart if there are items
           }
         }
       });
   }
 
   cartLoadNamesAndPrice(): void {
-    this.cartData?.items.forEach((item) => {
-      if (!item.name) {
-        item.name = this.items.find(
-          (element) => element.id === item.itemId
-        )?.name;
-        item.price = this.items.find(
-          (element) => element.id === item.itemId
-        )?.price;
-      }
+    this.cartState.cartData.update((currentCart) => {
+      if (!currentCart?.items) return currentCart;
+
+      const updatedItems = currentCart.items
+        .map((item) => {
+          const foundItem = this.items().find((i) => i.id === item.itemId);
+          if (!foundItem) return item;
+
+          return {
+            ...item,
+            name: foundItem.name,
+            price: foundItem.price ?? 0,
+          };
+        })
+        .sort((a, b) => a.itemId - b.itemId); // Sort items after mapping
+
+      return {
+        ...currentCart,
+        items: updatedItems,
+      };
     });
-    this.cartData?.items.sort((item1, item2) => item1.itemId - item2.itemId);
   }
 
   //Agregar elemento al carrito
   addToCart(itemId: number): void {
-    const item = this.items.find((i) => i.id === itemId);
-    if (item) {
-      this.saleService.addCart(this.profileid, itemId, 1).subscribe((cart) => {
-        this.cartData = cart;
-        this.cartLoadNamesAndPrice(); // Ensure names are loaded after adding an item
-        this.isCartOpen = true; // Open the cart after adding an item
-      });
+    if (this.isLoading()) return;
+
+    const item = this.items().find((i) => i.id === itemId);
+    if (!item) {
+      console.error('Item not found');
+      return;
     }
+    if (!item.stock || item.stock <= 0) {
+      alert('Este producto está agotado');
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.cartService
+      .addCart(this.profileid, itemId, 1)
+      .pipe(
+        catchError((error) => {
+          console.error('Error adding to cart:', error);
+          alert('Error al agregar al carrito');
+          return of(null);
+        })
+      )
+      .subscribe({
+        next: (cart) => {
+          if (cart) {
+            this.cartState.cartData.set(cart);
+            this.cartLoadNamesAndPrice();
+            this.cartState.isCartOpen.set(true);
+          }
+        },
+        complete: () => this.isLoading.set(false),
+      });
   }
 
   eliminateToCart(itemId: number): void {
-    this.saleService.removeFromCart(this.profileid, itemId).subscribe(() => {
+    this.cartService.removeFromCart(this.profileid, itemId).subscribe(() => {
       this.loadCart();
     });
   }
 
   increaseQuantity(item: { itemId: number; quantity: number }): void {
+    const product = this.items().find((i) => i.id === item.itemId);
+    if (!product || item.quantity >= product.stock) {
+      alert('No hay más stock disponible');
+      return;
+    }
     item.quantity += 1;
-    this.saleService.queueUpdateCartQuantity(this.profileid, item.itemId, item.quantity);
+    this.cartService.queueUpdateCartQuantity(
+      this.profileid,
+      item.itemId,
+      item.quantity
+    );
     this.cartLoadNamesAndPrice();
   }
 
   decreaseQuantity(item: { itemId: number; quantity: number }): void {
     if (item.quantity > 0) {
       item.quantity -= 1;
-      this.saleService.queueUpdateCartQuantity(this.profileid, item.itemId, item.quantity);
+      this.cartService.queueUpdateCartQuantity(
+        this.profileid,
+        item.itemId,
+        item.quantity
+      );
       this.cartLoadNamesAndPrice();
     }
   }
 
   updateQuantity(item: { itemId: number; quantity: number }): void {
-    this.saleService.queueUpdateCartQuantity(this.profileid, item.itemId, item.quantity);
+    this.cartService.queueUpdateCartQuantity(
+      this.profileid,
+      item.itemId,
+      item.quantity
+    );
     this.cartLoadNamesAndPrice();
   }
 
   goToCheckout(): void {
-    if (this.cartData?.items.length) {
-      this.saleService.checkout(this.cartData.id).subscribe({
-        next: (sale) => {
-          this.currentSale = sale;
-          environment.currentSale = sale; // Assign the sale to environment.currentSale
-          console.log('Navigating to /checkout');
-          this.router.navigate(['/checkout']);
-        },
-        error: (error) => {
-          console.error('Error during checkout:', error);
-          alert('Error during checkout. Please try again.');
-        },
-      });
-    } else {
+    const cart = this.cartState.cartData();
+    if (!cart?.items.length) {
       alert('No hay artículos en el carrito para proceder al checkout.');
+      return;
     }
+    if (cart.items.some((item) => item.quantity <= 0)) {
+      alert('No se pueden comprar productos con cantidad 0.');
+      return;
+    }
+    if (!cart.id) {
+      console.error('No cart data found');
+      return;
+    }
+
+    this.saleService.checkout(cart.id).subscribe({
+      next: (sale) => {
+        this.currentSale = sale;
+        environment.currentSale = sale;
+        console.log('Navigating to /checkout');
+        this.router.navigate(['/checkout']);
+      },
+      error: (error) => {
+        console.error('Error during checkout:', error);
+        alert('Error during checkout. Please try again.');
+      },
+    });
   }
 
   toggleCart(): void {
-    this.isCartOpen = !this.isCartOpen;
+    this.cartState.isCartOpen.update((v) => !v);
   }
 
   openCart(): void {
-    this.isCartOpen = true;
+    this.cartState.isCartOpen.set(true);
   }
 
   // Get category name by ID
   getCategoryNameById(id: number): string {
-    return this.categories.find((category) => category.id === id)?.name ?? '';
+    return this.categories().find((category) => category.id === id)?.name ?? '';
   }
 
   emptyCart(): void {
-    if (this.cartData) {
-      this.cartData.items.forEach((item) => {
-        this.saleService
+    if (this.cartState.cartData()) {
+      this.cartState.cartData()?.items.forEach((item) => {
+        this.cartService
           .removeFromCart(this.profileid, item.itemId)
           .subscribe(() => {
             this.loadCart();

@@ -3,11 +3,12 @@ export interface CartItem {
   itemId: number;
   quantity: number;
   name?: string;
-  price?: number; // Made price optional
+  price?: number;
+  imageUrl?: string;
 }
 
 export interface Cart {
   id: number;
-  enabled?: boolean;
+  enabled: boolean;
   items: CartItem[];
 }

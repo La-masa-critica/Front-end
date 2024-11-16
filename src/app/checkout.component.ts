@@ -1,18 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed, WritableSignal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Sale } from './sale.model';
 import { SaleService } from './sale.service';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { environment } from '../envitoment';
+import { environment } from '../environments/environment';
+import { DatePipe, CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
+  standalone: true,
+  imports: [DatePipe, CurrencyPipe],
+  hostDirectives: []
 })
 export class CheckoutComponent implements OnInit {
   profileid: number = 1;
-  checkoutData: Sale | null = null;
+  checkoutData: WritableSignal<Sale | null> = signal(null);
+
+  // Add computed properties
+  total = computed(() => this.checkoutData()?.total ?? 0);
+  saleDate = computed(() => this.checkoutData()?.date ?? '');
 
   constructor(
     private readonly router: Router,
@@ -25,8 +33,11 @@ export class CheckoutComponent implements OnInit {
   }
 
   confirmPurchase(): void {
+    const saleId = this.checkoutData()?.id;
+    if (!saleId) return;
+
     this.saleService
-      .confirmSale(this.checkoutData?.id)
+      .confirmSale(saleId)
       .pipe(
         catchError((error) => {
           console.error('Error confirming purchase:', error);
@@ -35,7 +46,7 @@ export class CheckoutComponent implements OnInit {
       )
       .subscribe((sale: Sale | null) => {
         if (sale) {
-          this.checkoutData = sale;
+          this.checkoutData.set(sale);
           console.log('Purchase confirmed:', sale);
           alert('Compra confirmada');
           this.router.navigate(['/']);
@@ -47,7 +58,7 @@ export class CheckoutComponent implements OnInit {
 
   cancelPurchase(): void {
     this.saleService
-      .cancelSale(this.checkoutData?.id)
+      .cancelSale(this.checkoutData()?.id)
       .pipe(
         catchError((error) => {
           console.error('Error canceling purchase:', error);
@@ -56,7 +67,7 @@ export class CheckoutComponent implements OnInit {
       )
       .subscribe((sale: Sale | null) => {
         if (sale) {
-          this.checkoutData = sale;
+          this.checkoutData.set(sale);
           alert('Compra cancelada');
           this.router.navigate(['/']);
         }
@@ -65,12 +76,14 @@ export class CheckoutComponent implements OnInit {
 
   loadcheckout(): void {
     console.log('loadcheckout called');
-    this.checkoutData = environment.currentSale; // Read the sale from environment.currentSale
-    if (!this.checkoutData) {
+    const sale = environment.currentSale;
+    if (!sale) {
       alert('No hay compra en proceso');
       this.router.navigate(['/']);
-    } else {
-      console.log('Checkout data:', this.checkoutData);
+      return;
     }
+
+    this.checkoutData.set(sale);
+    console.log('Checkout data:', this.checkoutData());
   }
 }
