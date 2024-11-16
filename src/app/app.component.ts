@@ -1,8 +1,7 @@
 import { Component } from '@angular/core';
-import { Router, RouterModule, NavigationEnd } from '@angular/router';
-import { CartStateService } from './cart-state.service';
+import { Router, RouterModule } from '@angular/router';
+import { CartStateService } from './services/cart-state.service';
 import { NgClass } from '@angular/common';
-import { filter } from 'rxjs';
 
 @Component({
   selector: 'app-root',

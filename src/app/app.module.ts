@@ -4,14 +4,14 @@ import { provideHttpClient } from '@angular/common/http';
 // import { AppRoutingModule } from './app-routing.module';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { SaleService } from './sale.service';
+import { SaleService } from './services/sale.service';
 
 @NgModule({
   imports: [
     BrowserModule,
     // AppRoutingModule,
     FormsModule,
-    RouterModule
+    RouterModule,
   ],
   providers: [SaleService, provideHttpClient()],
   // bootstrap: [AppComponent]

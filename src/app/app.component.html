@@ -1,6 +1,11 @@
 <div class="bg-gray-200 min-h-screen">
-  <nav class="bg-indigo-600 p-4 text-white flex justify-between items-center fixed top-0 left-0 w-full z-50"
-       [ngClass]="{ 'w-4/5': cartState.isCartOpen(), 'w-full': !cartState.isCartOpen() }">
+  <nav
+    class="bg-indigo-600 p-4 text-white flex justify-between items-center fixed top-0 left-0 w-full z-50"
+    [ngClass]="{
+      'w-4/5': cartState.isCartOpen(),
+      'w-full': !cartState.isCartOpen()
+    }"
+  >
     <div class="flex items-center justify-between w-full">
       <div class="text-lg flex items-center space-x-4">
         <a routerLink="/" class="hover:text-indigo-200">Inicio</a>
@@ -12,12 +17,12 @@
         </button>
       </div>
       @if (router.url === '/') {
-        <button
-          (click)="cartState.toggleCart()"
-          class="bg-indigo-800 p-2 rounded hover:bg-indigo-700"
-        >
-          Ver Carrito ({{ cartState.cartItemCount() }})
-        </button>
+      <button
+        (click)="cartState.toggleCart()"
+        class="bg-indigo-800 p-2 rounded hover:bg-indigo-700"
+      >
+        Ver Carrito ({{ cartState.cartItemCount() }})
+      </button>
       }
     </div>
   </nav>

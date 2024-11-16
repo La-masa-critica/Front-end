@@ -5,31 +5,27 @@ import {
   computed,
   WritableSignal,
 } from '@angular/core';
-import { ItemService } from './item.service';
-import { CategoryService } from './category.service';
-import { Item } from './item.model';
-import { Category } from './category.model';
+import { ItemService } from '../services/item.service';
+import { CategoryService } from '../services/category.service';
+import { Item } from '../models/item.model';
+import { Category } from '../models/category.model';
 import { catchError, of } from 'rxjs';
-import { SaleService } from './sale.service';
-import { CartService } from './cart.service';
-import { Cart } from './cart.model';
-import { Sale } from './sale.model';
+import { SaleService } from '../services/sale.service';
+import { CartService } from '../services/cart.service';
+import { Cart } from '../models/cart.model';
+import { Sale } from '../models/sale.model';
 import { Router } from '@angular/router';
-import { environment } from '../environments/environment';
-import {
-  DecimalPipe,
-  NgClass,
-  NgOptimizedImage,
-} from '@angular/common';
+import { environment } from '../../environments/environment';
+import { DecimalPipe, NgClass, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CartStateService } from './cart-state.service';
+import { CartStateService } from '../services/cart-state.service';
 
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
   standalone: true,
   imports: [FormsModule, DecimalPipe, NgOptimizedImage, NgClass],
-  providers: [ItemService, CategoryService, SaleService, CartService]
+  providers: [ItemService, CategoryService, SaleService, CartService],
 })
 export class MainComponent implements OnInit {
   items: WritableSignal<Item[]> = signal([]);

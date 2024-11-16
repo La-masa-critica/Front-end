@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
-import { Sale } from './sale.model';
-import { environment } from '../environments/environment';
+import { Sale } from '../models/sale.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -55,7 +55,8 @@ export class SaleService {
     return this.http.get<Sale>(`${this.apiUrl}/${saleId}`);
   }
 
-  getSaleByProfileId(profileId: number): Observable<Sale[]> { // TODO: Fix the backend to pass the profileId as a query parameter
+  getSaleByProfileId(profileId: number): Observable<Sale[]> {
+    // TODO: Fix the backend to pass the profileId as a query parameter
     const params = new HttpParams().set('profileId', profileId);
     return this.http.get<Sale[]>(`${this.apiUrl}`, { params });
   }

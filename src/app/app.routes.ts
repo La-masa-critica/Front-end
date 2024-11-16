@@ -1,23 +1,23 @@
 import { Routes } from '@angular/router';
-import { MainComponent } from './main.component';
-import { CheckoutComponent } from './checkout.component';
-import { SalesHistoryComponent } from './sales-history.component';
+import { MainComponent } from './components/main.component';
+import { CheckoutComponent } from './components/checkout.component';
+import { SalesHistoryComponent } from './components/sales-history.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: MainComponent
+    component: MainComponent,
   },
   {
     path: 'checkout',
-    component: CheckoutComponent
+    component: CheckoutComponent,
   },
   {
     path: 'sales-history',
-    component: SalesHistoryComponent
+    component: SalesHistoryComponent,
   },
   {
     path: '**',
-    redirectTo: ''
-  }
+    redirectTo: '',
+  },
 ];

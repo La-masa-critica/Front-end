@@ -1,10 +1,16 @@
-import { Component, OnInit, signal, computed, WritableSignal } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  signal,
+  computed,
+  WritableSignal,
+} from '@angular/core';
 import { Router } from '@angular/router';
-import { Sale } from './sale.model';
-import { SaleService } from './sale.service';
+import { Sale } from '../models/sale.model';
+import { SaleService } from '../services/sale.service';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { environment } from '../environments/environment';
+import { environment } from '../../environments/environment';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 
 @Component({
@@ -12,7 +18,7 @@ import { DatePipe, CurrencyPipe } from '@angular/common';
   templateUrl: './checkout.component.html',
   standalone: true,
   imports: [DatePipe, CurrencyPipe],
-  hostDirectives: []
+  hostDirectives: [],
 })
 export class CheckoutComponent implements OnInit {
   profileid: number = 1;

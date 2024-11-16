@@ -98,68 +98,70 @@
   </div>
 
   @if(cartState.isCartOpen()) {
-    <div class="cart bg-white shadow-lg fixed top-16 right-0 h-[calc(100vh-4rem)] w-1/5 p-4 transition-transform duration-300 transform translate-x-0 flex flex-col">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-bold text-indigo-800">Carrito</h2>
-        <button
-          (click)="emptyCart()"
-          class="bg-red-500 text-white p-2 rounded hover:bg-red-400"
-        >
-          Vaciar
-        </button>
-      </div>
-      <div class="flex-1 overflow-y-auto">
-        @if(cartState.cartData()?.items?.length) {
-          @for(item of cartState.cartData()?.items; track item.itemId) {
-        <div class="cart-item mb-4 p-4 bg-indigo-100 rounded-lg shadow-md flex">
-          <img
-            [ngSrc]="item.imageUrl || '../assets/default-product.jpg'"
-            width="64"
-            height="64"
-            priority
-            [alt]="item.name"
-            title="{{ item.name }}"
-            (error)="$any($event.target).src = '../assets/default-product.jpg'"
-            class="mr-4 rounded object-cover"
-          />
-          <div class="flex-1">
-            <h3 class="font-bold text-lg text-indigo-800">{{ item.name }}</h3>
-            <p class="text-indigo-700">Precio: {{ item.price }}</p>
-            <div class="flex justify-center items-center mt-2 space-x-2">
-              <button
-                (click)="decreaseQuantity(item)"
-                class="bg-red-500 text-white p-2 rounded hover:bg-red-400 w-8 h-8 flex items-center justify-center"
-              >
-                -
-              </button>
-              <span class="mx-2">{{ item.quantity }}</span>
-              <button
-                (click)="increaseQuantity(item)"
-                class="bg-green-500 text-white p-2 rounded hover:bg-green-400 w-8 h-8 flex items-center justify-center"
-              >
-                +
-              </button>
-            </div>
-            <div class="mt-2 flex justify-center">
-              <button
-                (click)="eliminateToCart(item.itemId)"
-                class="bg-red-500 text-white p-2 rounded hover:bg-red-400 w-24"
-              >
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-        } } @else {
-          <p class="text-indigo-800">El carrito está vacío.</p>
-        }
-      </div>
+  <div
+    class="cart bg-white shadow-lg fixed top-16 right-0 h-[calc(100vh-4rem)] w-1/5 p-4 transition-transform duration-300 transform translate-x-0 flex flex-col"
+  >
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-bold text-indigo-800">Carrito</h2>
       <button
-        (click)="goToCheckout()"
-        class="w-full p-2 bg-indigo-600 text-white rounded hover:bg-indigo-500 mt-4"
+        (click)="emptyCart()"
+        class="bg-red-500 text-white p-2 rounded hover:bg-red-400"
       >
-        Ir al Checkout
+        Vaciar
       </button>
     </div>
+    <div class="flex-1 overflow-y-auto">
+      @if(cartState.cartData()?.items?.length) { @for(item of
+      cartState.cartData()?.items; track item.itemId) {
+      <div class="cart-item mb-4 p-4 bg-indigo-100 rounded-lg shadow-md flex">
+        <img
+          [ngSrc]="item.imageUrl || '../assets/default-product.jpg'"
+          width="64"
+          height="64"
+          priority
+          [alt]="item.name"
+          title="{{ item.name }}"
+          (error)="$any($event.target).src = '../assets/default-product.jpg'"
+          class="mr-4 rounded object-cover"
+        />
+        <div class="flex-1">
+          <h3 class="font-bold text-lg text-indigo-800">{{ item.name }}</h3>
+          <p class="text-indigo-700">Precio: {{ item.price }}</p>
+          <div class="flex justify-center items-center mt-2 space-x-2">
+            <button
+              (click)="decreaseQuantity(item)"
+              class="bg-red-500 text-white p-2 rounded hover:bg-red-400 w-8 h-8 flex items-center justify-center"
+            >
+              -
+            </button>
+            <span class="mx-2">{{ item.quantity }}</span>
+            <button
+              (click)="increaseQuantity(item)"
+              class="bg-green-500 text-white p-2 rounded hover:bg-green-400 w-8 h-8 flex items-center justify-center"
+            >
+              +
+            </button>
+          </div>
+          <div class="mt-2 flex justify-center">
+            <button
+              (click)="eliminateToCart(item.itemId)"
+              class="bg-red-500 text-white p-2 rounded hover:bg-red-400 w-24"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+      } } @else {
+      <p class="text-indigo-800">El carrito está vacío.</p>
+      }
+    </div>
+    <button
+      (click)="goToCheckout()"
+      class="w-full p-2 bg-indigo-600 text-white rounded hover:bg-indigo-500 mt-4"
+    >
+      Ir al Checkout
+    </button>
+  </div>
   }
 </div>

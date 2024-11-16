@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { SaleService } from './sale.service';
-import { Sale } from './sale.model';
+import { SaleService } from '../services/sale.service';
+import { Sale } from '../models/sale.model';
 import { DatePipe, CurrencyPipe, NgClass } from '@angular/common';
 
 @Component({
@@ -27,16 +27,18 @@ export class SalesHistoryComponent implements OnInit {
 
     this.saleService.getSaleByProfileId(this.profileId).subscribe({
       next: (sales) => {
-        this.sales.set(sales.sort((a, b) => {
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        }));
+        this.sales.set(
+          sales.sort((a, b) => {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+          })
+        );
         this.isLoading.set(false);
       },
       error: (error) => {
         console.error('Error loading sales:', error);
         this.error.set('Error al cargar el historial de compras');
         this.isLoading.set(false);
-      }
+      },
     });
   }
 

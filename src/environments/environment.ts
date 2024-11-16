@@ -1,4 +1,4 @@
-import { Sale } from "../app/sale.model";
+import { Sale } from '../app/models/sale.model';
 
 export const environment = {
   production: false,
