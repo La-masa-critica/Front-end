@@ -1,10 +1,8 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { CheckoutComponent } from './checkout.component';
-const routes: Routes = [{ path: 'checkout', component: CheckoutComponent },];
+import { Routes } from '@angular/router';
+import { MainComponent } from './components/main.component';
+import { CheckoutComponent } from './components/checkout.component';
 
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
-})
-export class AppRoutingModule { }
+export const routes: Routes = [
+  { path: '', component: MainComponent },
+  { path: 'checkout', component: CheckoutComponent },
+];

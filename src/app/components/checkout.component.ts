@@ -1,0 +1,95 @@
+import {
+  Component,
+  OnInit,
+  signal,
+  computed,
+  WritableSignal,
+} from '@angular/core';
+import { Router } from '@angular/router';
+import { Sale } from '../models/sale.model';
+import { SaleService } from '../services/sale.service';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { DatePipe, CurrencyPipe } from '@angular/common';
+
+@Component({
+  selector: 'app-checkout',
+  templateUrl: './checkout.component.html',
+  standalone: true,
+  imports: [DatePipe, CurrencyPipe],
+  hostDirectives: [],
+})
+export class CheckoutComponent implements OnInit {
+  profileid: number = 1;
+  checkoutData: WritableSignal<Sale | null> = signal(null);
+
+  // Add computed properties
+  total = computed(() => this.checkoutData()?.total ?? 0);
+  saleDate = computed(() => this.checkoutData()?.date ?? '');
+
+  constructor(
+    private readonly router: Router,
+    private readonly saleService: SaleService
+  ) {}
+
+  ngOnInit(): void {
+    console.log('CheckoutComponent initialized');
+    this.loadcheckout();
+  }
+
+  confirmPurchase(): void {
+    const saleId = this.checkoutData()?.id;
+    if (!saleId) return;
+
+    this.saleService
+      .confirmSale(saleId)
+      .pipe(
+        catchError((error) => {
+          console.error('Error confirming purchase:', error);
+          return of(null);
+        })
+      )
+      .subscribe((sale: Sale | null) => {
+        if (sale) {
+          this.checkoutData.set(sale);
+          console.log('Purchase confirmed:', sale);
+          alert('Compra confirmada');
+          this.router.navigate(['/']);
+        } else {
+          console.error('Error: Sale is null');
+        }
+      });
+  }
+
+  cancelPurchase(): void {
+    this.saleService
+      .cancelSale(this.checkoutData()?.id)
+      .pipe(
+        catchError((error) => {
+          console.error('Error canceling purchase:', error);
+          return of(null);
+        })
+      )
+      .subscribe((sale: Sale | null) => {
+        if (sale) {
+          this.checkoutData.set(sale);
+          alert('Compra cancelada');
+          this.router.navigate(['/']);
+        }
+      });
+  }
+
+  loadcheckout(): void {
+    console.log('loadcheckout called');
+    const sale = environment.currentSale;
+    if (!sale) {
+      alert('No hay compra en proceso');
+      this.router.navigate(['/']);
+      return;
+    }
+
+    this.checkoutData.set(sale);
+    console.log('Checkout data:', this.checkoutData());
+  }
+}

@@ -1,0 +1,55 @@
+<h2 class="text-2xl font-bold mb-4 text-gray-800">Confirmar Compra</h2>
+<p class="mb-4 text-gray-600">
+  Revise los productos en su carrito y proporcione la información necesaria para
+  completar la compra.
+</p>
+
+@if (checkoutData()) {
+<div class="bg-white p-6 rounded-lg shadow-md">
+  <h2 class="text-xl font-semibold mb-2 text-gray-800">
+    Detalles de la Compra
+  </h2>
+
+  <div class="mb-2 text-gray-600">
+    <strong>Fecha:</strong> {{ checkoutData()?.date | date : "short" }}
+  </div>
+
+  <div class="mb-4 text-gray-600">
+    <strong>Total:</strong> {{ checkoutData()?.total | currency }}
+  </div>
+
+  <h3 class="text-lg font-semibold mb-2 text-gray-800">Detalles de la Venta</h3>
+  <table class="min-w-full bg-white border border-gray-200">
+    <thead>
+      <tr>
+        <th class="py-2 px-4 border-b text-gray-800">Item ID</th>
+        <th class="py-2 px-4 border-b text-gray-800">Cantidad</th>
+        <th class="py-2 px-4 border-b text-gray-800">Precio Unidad</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (detail of checkoutData()?.saleDetails; track detail.itemId) {
+      <tr class="border-b">
+        <td class="py-2 px-4 text-gray-600">{{ detail.itemId }}</td>
+        <td class="py-2 px-4 text-gray-600">{{ detail.quantity }}</td>
+        <td class="py-2 px-4 text-gray-600">{{ detail.price | currency }}</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
+}
+<div class="mt-4 flex space-x-4">
+  <button
+    (click)="confirmPurchase()"
+    class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500"
+  >
+    Confirmar
+  </button>
+  <button
+    (click)="cancelPurchase()"
+    class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-500"
+  >
+    Cancelar
+  </button>
+</div>
