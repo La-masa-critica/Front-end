@@ -1,11 +1,11 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { SaleService } from '../services/sale.service';
-import { Sale } from '../models/sale.model';
+import { SaleService } from '@services/sale.service';
+import { Sale } from '@models/sale.model';
 import { DatePipe, CurrencyPipe, NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-sales-history',
-  templateUrl: './sales-history.component.html',
+  templateUrl: '../html/sales-history.component.html',
   standalone: true,
   imports: [DatePipe, CurrencyPipe, NgClass],
 })

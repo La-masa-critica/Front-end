@@ -66,13 +66,13 @@
       @for(item of items(); track item.id) {
       <div class="product-item border p-4 mb-4 rounded bg-white shadow-lg flex">
         <img
-          [ngSrc]="item.imageUrl || '../assets/default-product.jpg'"
+          [ngSrc]="item.imageUrl || '../../assets/default-product.jpg'"
           width="96"
           height="96"
           priority
           [alt]="item.name"
           title="{{ item.name }}"
-          (error)="$any($event.target).src = '../assets/default-product.jpg'"
+          (error)="$any($event.target).src = '../../assets/default-product.jpg'"
           class="mr-4 rounded object-cover"
         />
         <div class="flex-1">
@@ -115,13 +115,13 @@
       cartState.cartData()?.items; track item.itemId) {
       <div class="cart-item mb-4 p-4 bg-indigo-100 rounded-lg shadow-md flex">
         <img
-          [ngSrc]="item.imageUrl || '../assets/default-product.jpg'"
+          [ngSrc]="item.imageUrl || '../../assets/default-product.jpg'"
           width="64"
           height="64"
           priority
           [alt]="item.name"
           title="{{ item.name }}"
-          (error)="$any($event.target).src = '../assets/default-product.jpg'"
+          (error)="$any($event.target).src = '../../assets/default-product.jpg'"
           class="mr-4 rounded object-cover"
         />
         <div class="flex-1">

@@ -5,23 +5,23 @@ import {
   computed,
   WritableSignal,
 } from '@angular/core';
-import { ItemService } from '../services/item.service';
-import { CategoryService } from '../services/category.service';
-import { Item } from '../models/item.model';
-import { Category } from '../models/category.model';
+import { ItemService } from '@services/item.service';
+import { CategoryService } from '@services/category.service';
+import { Item } from '@models/item.model';
+import { Category } from '@models/category.model';
 import { catchError, of } from 'rxjs';
-import { SaleService } from '../services/sale.service';
-import { CartService } from '../services/cart.service';
-import { Sale } from '../models/sale.model';
+import { SaleService } from '@services/sale.service';
+import { CartService } from '@services/cart.service';
+import { Sale } from '@models/sale.model';
 import { Router } from '@angular/router';
-import { environment } from '../../environments/environment';
+import { environment } from '@env/environment';
 import { DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CartStateService } from '../services/cart-state.service';
+import { CartStateService } from '@services/cart-state.service';
 
 @Component({
   selector: 'app-main',
-  templateUrl: './main.component.html',
+  templateUrl: '../html/main.component.html',
   standalone: true,
   imports: [FormsModule, DecimalPipe, NgOptimizedImage],
   providers: [ItemService, CategoryService, SaleService, CartService],

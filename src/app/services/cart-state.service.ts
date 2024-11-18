@@ -1,5 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { Cart } from '../models/cart.model';
+import { Cart } from '@models/cart.model';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 

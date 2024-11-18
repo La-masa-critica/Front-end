@@ -6,16 +6,16 @@ import {
   WritableSignal,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { Sale } from '../models/sale.model';
-import { SaleService } from '../services/sale.service';
+import { Sale } from '@models/sale.model';
+import { SaleService } from '@services/sale.service';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { environment } from '@env/environment';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-checkout',
-  templateUrl: './checkout.component.html',
+  templateUrl: '../html/checkout.component.html',
   standalone: true,
   imports: [DatePipe, CurrencyPipe],
   hostDirectives: [],
