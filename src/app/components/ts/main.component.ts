@@ -70,6 +70,8 @@ export class MainComponent implements OnInit {
     this.loadItems();
     this.loadCategories();
     this.loadCart();
+    this.cartState.isCartOpen.set(true);
+    this.cartLoadNamesAndPrice();
   }
 
   //Carga productos

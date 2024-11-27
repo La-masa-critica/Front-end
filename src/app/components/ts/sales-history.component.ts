@@ -2,8 +2,6 @@ import { Component, OnInit, signal } from '@angular/core';
 import { SaleService } from '@services/sale.service';
 import { Sale } from '@models/sale.model';
 import { DatePipe, CurrencyPipe, NgClass } from '@angular/common';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AuthInterceptor } from '@app/interceptors/auth.interceptor';
 
 
 @Component({
@@ -11,9 +9,6 @@ import { AuthInterceptor } from '@app/interceptors/auth.interceptor';
   templateUrl: '../html/sales-history.component.html',
   standalone: true,
   imports: [DatePipe, CurrencyPipe, NgClass],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
-  ]
 })
 export class SalesHistoryComponent implements OnInit {
   sales = signal<Sale[]>([]);
