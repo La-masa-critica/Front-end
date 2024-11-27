@@ -8,13 +8,15 @@
   >
     <div class="flex items-center justify-between w-full">
       <div class="text-lg flex items-center space-x-4">
-        <a routerLink="/" class="hover:text-indigo-200">Inicio</a>
-        <button
-          routerLink="/sales-history"
-          class="bg-indigo-700 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors duration-200 flex items-center space-x-2"
-        >
-          <span>Mis Compras</span>
-        </button>
+        @if(router.url != '/login' && router.url != '/register') {
+          <a routerLink="/" class="hover:text-indigo-200">Inicio</a>
+          <button
+            routerLink="/sales-history"
+            class="bg-indigo-700 px-4 py-2 rounded-lg hover:bg-indigo-800 transition-colors duration-200 flex items-center space-x-2"
+          >
+            <span>Mis Compras</span>
+          </button>
+        }
       </div>
       @if (router.url === '/') {
       <button
@@ -24,6 +26,12 @@
         Ver Carrito ({{ cartState.cartItemCount() }})
       </button>
       }
+      <button
+        (click)="logout()"
+        class="bg-red-600 p-2 rounded hover:bg-red-500 ml-2"
+      >
+        Logout
+      </button>
     </div>
   </nav>
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Item } from '@models/item.model';
 import { environment } from '@env/environment';
@@ -12,16 +12,27 @@ export class ItemService {
 
   constructor(private readonly http: HttpClient) {}
 
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      Accept: 'application/json',
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
   getItems(): Observable<Item[]> {
-    return this.http.get<Item[]>(`${this.baseUrl}/all`);
+    const headers = this.getAuthHeaders();
+    return this.http.get<Item[]>(`${this.baseUrl}/all`, { headers });
   }
 
   createItem(item: Item): Observable<Item> {
-    return this.http.post<Item>(`${this.baseUrl}/new`, item);
+    const headers = this.getAuthHeaders();
+    return this.http.post<Item>(`${this.baseUrl}/new`, item, { headers });
   }
 
   getItemById(id: number): Observable<Item> {
-    return this.http.get<Item>(`${this.baseUrl}/${id}`);
+    const headers = this.getAuthHeaders();
+    return this.http.get<Item>(`${this.baseUrl}/${id}`, { headers });
   }
 
   filterItems(
@@ -30,6 +41,7 @@ export class ItemService {
     maxPrice?: number
   ): Observable<Item[]> {
     let params = new HttpParams();
+    const headers = this.getAuthHeaders();
 
     // Agrega las categorías solo si `categoryIds` no está vacío
     if (categoryIds !== undefined) {
@@ -51,6 +63,6 @@ export class ItemService {
     }
     console.log(params);
     // Realiza la solicitud GET con los parámetros
-    return this.http.get<Item[]>(`${this.baseUrl}/filter`, { params });
+    return this.http.get<Item[]>(`${this.baseUrl}/filter`, { headers, params });
   }
 }

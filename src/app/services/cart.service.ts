@@ -27,28 +27,40 @@ export class CartService {
       .subscribe();
   }
 
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      Accept: 'application/json',
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
   addCart(cartId: number, itemId: number, quantity: number): Observable<Cart> {
     const body = {
       cartId: cartId,
       itemId: itemId,
       quantity: quantity,
     };
-    return this.http.post<Cart>(`${this.apiUrl}/add`, body);
+    const headers = this.getAuthHeaders();
+    return this.http.post<Cart>(`${this.apiUrl}/add`, body, { headers });
   }
 
   emptyCart(profileId: number): Observable<void> {
     const params = { profileId: profileId };
-    return this.http.delete<void>(`${this.apiUrl}/clear`, { params });
+    const headers = this.getAuthHeaders();
+    return this.http.delete<void>(`${this.apiUrl}/clear`, { headers, params });
   }
 
   removeFromCart(profileId: number, itemId: number): Observable<Cart> {
     const params = { profileId: profileId, itemId: itemId };
-    return this.http.delete<Cart>(`${this.apiUrl}/delete`, { params });
+    const headers = this.getAuthHeaders();
+    return this.http.delete<Cart>(`${this.apiUrl}/delete`, { headers, params });
   }
 
   getCartByProfileId(profileId: number): Observable<Cart> {
     const url = `${this.apiUrl}/${profileId}`;
-    return this.http.get<Cart>(url);
+    const headers = this.getAuthHeaders();
+    return this.http.get<Cart>(url, { headers });
   }
 
   updateCartQuantity(
@@ -60,19 +72,13 @@ export class CartService {
       return of({ id: profileId, items: [], enabled: true } as Cart);
     }
 
-    const headers = new HttpHeaders({
-      Accept: 'application/json',
-    });
+    const headers = this.getAuthHeaders();
     const params = new HttpParams()
       .set('profileId', profileId)
       .set('itemId', itemId)
       .set('quantity', quantity);
 
-    // Realizar la solicitud PUT
-    return this.http.put<Cart>(`${this.apiUrl}/update`, null, {
-      headers,
-      params,
-    });
+    return this.http.put<Cart>(`${this.apiUrl}/update`, null, { headers, params });
   }
 
   queueUpdateCartQuantity(

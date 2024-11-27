@@ -31,7 +31,11 @@ export class authService {
   }
 
   register(register: Registro): Observable<any> {
-    return this.http.post<any>(this.apiUrl+"register", register);
+    return this.http.post<any>(this.apiUrl+"register", register).pipe(
+      tap(response => {
+        localStorage.setItem('token', response.token);
+      })
+    );
   }
 
 }

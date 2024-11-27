@@ -1,13 +1,11 @@
 import { Sale } from '../app/models/sale.model';
 
-const apiUrl = 'http://localhost:8080/api/v1';
-
 export const environment = {
-  production: true,
-  apiUrl: apiUrl, // Usar proxy para desarrollo
-  itemApiUrl: `${apiUrl}/item`,
-  categoryApiUrl: `${apiUrl}/category`,
-  cartApiUrl: `${apiUrl}/cart`,
-  saleApiUrl: `${apiUrl}/sale`,
+  production: false,
+  apiUrl: '/api/v1', // Usar proxy para desarrollo
+  itemApiUrl: '/api/v1/item',
+  categoryApiUrl: '/api/v1/category',
+  cartApiUrl: '/api/v1/cart',
+  saleApiUrl: '/api/v1/sale',
   currentSale: null as Sale | null,
 };

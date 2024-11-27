@@ -19,7 +19,7 @@ export class registerComponent {
 
   register(): void {
     this.authService.register(this.registro).subscribe({
-      next: () => this.router.navigate(['/']),
+      next: () => this.router.navigate(['']),
       error: err => this.errorMessage = 'Registration failed'
     });
   }

@@ -17,9 +17,18 @@ export class SaleService {
   }>();
   constructor(private readonly http: HttpClient) {}
 
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      Accept: 'application/json',
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
   checkout(cartId: number): Observable<Sale> {
     const params = new HttpParams().set('cartId', cartId);
-    return this.http.post<Sale>(`${this.apiUrl}/checkout`, {}, { params });
+    const headers = this.getAuthHeaders();
+    return this.http.post<Sale>(`${this.apiUrl}/checkout`, {}, { headers, params });
   }
 
   confirmSale(saleId: number | undefined): Observable<Sale> {
@@ -27,14 +36,8 @@ export class SaleService {
       throw new Error('The saleId cannot be undefined');
     }
     const params = new HttpParams().set('saleId', saleId);
-    const headers = new HttpHeaders({
-      Accept: 'application/json',
-    });
-
-    return this.http.put<Sale>(`${this.apiUrl}/confirm`, null, {
-      headers,
-      params,
-    });
+    const headers = this.getAuthHeaders();
+    return this.http.put<Sale>(`${this.apiUrl}/confirm`, null, { headers, params });
   }
 
   cancelSale(saleId: number | undefined): Observable<Sale> {
@@ -42,14 +45,8 @@ export class SaleService {
       throw new Error('The saleId cannot be undefined');
     }
     const params = new HttpParams().set('saleId', saleId);
-    const headers = new HttpHeaders({
-      Accept: 'application/json',
-    });
-
-    return this.http.put<Sale>(`${this.apiUrl}/cancel`, null, {
-      headers,
-      params,
-    });
+    const headers = this.getAuthHeaders();
+    return this.http.put<Sale>(`${this.apiUrl}/cancel`, null, { headers, params });
   }
 
   failSale(saleId: number | undefined): Observable<Cart> {
@@ -57,22 +54,18 @@ export class SaleService {
       throw new Error('The saleId cannot be undefined');
     }
     const params = new HttpParams().set('saleId', saleId);
-    const headers = new HttpHeaders({
-      Accept: 'application/json',
-    });
-
-    return this.http.put<Cart>(`${this.apiUrl}/fail`, null, {
-      headers,
-      params,
-    });
+    const headers = this.getAuthHeaders();
+    return this.http.put<Cart>(`${this.apiUrl}/fail`, null, { headers, params });
   }
 
   getSaleById(saleId: number): Observable<Sale> {
-    return this.http.get<Sale>(`${this.apiUrl}/${saleId}`);
+    const headers = this.getAuthHeaders();
+    return this.http.get<Sale>(`${this.apiUrl}/${saleId}`, { headers });
   }
 
   getSaleByProfileId(profileId: number): Observable<Sale[]> {
     const params = new HttpParams().set('profileId', profileId);
-    return this.http.get<Sale[]>(`${this.apiUrl}`, { params });
+    const headers = this.getAuthHeaders();
+    return this.http.get<Sale[]>(`${this.apiUrl}`, { headers, params });
   }
 }

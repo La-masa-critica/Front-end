@@ -1,10 +1,11 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SaleService } from '@services/sale.service';
 import { loginComponent } from '@components/ts/loginComponent';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 @NgModule({
   imports: [
@@ -12,6 +13,10 @@ import { loginComponent } from '@components/ts/loginComponent';
     FormsModule,
     RouterModule,
   ],
-  providers: [SaleService, provideHttpClient()],
+  providers: [
+    SaleService,
+    provideHttpClient(),
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  ],
 })
 export class AppModule {}
