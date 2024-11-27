@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { Sale } from '@models/sale.model';
+import { Cart } from '@models/cart.model';
 import { environment } from '@env/environment';
 
 @Injectable({
@@ -46,6 +47,21 @@ export class SaleService {
     });
 
     return this.http.put<Sale>(`${this.apiUrl}/cancel`, null, {
+      headers,
+      params,
+    });
+  }
+
+  failSale(saleId: number | undefined): Observable<Cart> {
+    if (saleId == undefined) {
+      throw new Error('The saleId cannot be undefined');
+    }
+    const params = new HttpParams().set('saleId', saleId);
+    const headers = new HttpHeaders({
+      Accept: 'application/json',
+    });
+
+    return this.http.put<Cart>(`${this.apiUrl}/fail`, null, {
       headers,
       params,
     });
