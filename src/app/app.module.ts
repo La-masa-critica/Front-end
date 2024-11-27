@@ -4,6 +4,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SaleService } from '@services/sale.service';
+import { loginComponent } from '@components/ts/loginComponent';
 
 @NgModule({
   imports: [
