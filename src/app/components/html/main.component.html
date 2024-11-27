@@ -66,17 +66,20 @@
       @for(item of items(); track item.id) {
       <div class="product-item border p-4 mb-4 rounded bg-white shadow-lg flex">
         <img
-          [ngSrc]="item.imageUrl || '../assets/default-product.jpg'"
+          [ngSrc]="item.imageUrl || '../../assets/default-product.jpg'"
           width="96"
           height="96"
           priority
           [alt]="item.name"
           title="{{ item.name }}"
-          (error)="$any($event.target).src = '../assets/default-product.jpg'"
+          (error)="$any($event.target).src = '../../assets/default-product.jpg'"
           class="mr-4 rounded object-cover"
         />
         <div class="flex-1">
           <h3 class="font-bold text-lg text-indigo-800">{{ item.name }}</h3>
+          <p class="text-gray-600 mb-2">
+            {{ item.description || "Sin descripción disponible" }}
+          </p>
           <p class="text-indigo-700">
             Precio: {{ item.price | number : "1.2-2" }}
           </p>
@@ -113,15 +116,22 @@
     <div class="flex-1 overflow-y-auto">
       @if(cartState.cartData()?.items?.length) { @for(item of
       cartState.cartData()?.items; track item.itemId) {
-      <div class="cart-item mb-4 p-4 bg-indigo-100 rounded-lg shadow-md flex">
+      <div
+        class="cart-item mb-4 p-4 bg-indigo-100 rounded-lg shadow-md flex relative"
+      >
+        @if(!isItemEnabled(item.itemId)) {
+        <div
+          class="absolute inset-0 bg-gray-500 bg-opacity-50 z-10 rounded-lg"
+        ></div>
+        }
         <img
-          [ngSrc]="item.imageUrl || '../assets/default-product.jpg'"
+          [ngSrc]="item.imageUrl || '../../assets/default-product.jpg'"
           width="64"
           height="64"
           priority
           [alt]="item.name"
           title="{{ item.name }}"
-          (error)="$any($event.target).src = '../assets/default-product.jpg'"
+          (error)="$any($event.target).src = '../../assets/default-product.jpg'"
           class="mr-4 rounded object-cover"
         />
         <div class="flex-1">
@@ -158,9 +168,13 @@
     </div>
     <button
       (click)="goToCheckout()"
+      [disabled]="hasDisabledItems()"
+      [class.opacity-50]="hasDisabledItems()"
+      [class.cursor-not-allowed]="hasDisabledItems()"
       class="w-full p-2 bg-indigo-600 text-white rounded hover:bg-indigo-500 mt-4"
     >
-      Ir al Checkout
+      @if(hasDisabledItems()) { Hay productos deshabilitados en el carrito }
+      @else { Ir al Checkout }
     </button>
   </div>
   }

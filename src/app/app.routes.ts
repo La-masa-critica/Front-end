@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
-import { MainComponent } from './components/main.component';
-import { CheckoutComponent } from './components/checkout.component';
-import { SalesHistoryComponent } from './components/sales-history.component';
+import { MainComponent } from '@components/ts/main.component';
+import { CheckoutComponent } from '@components/ts/checkout.component';
+import { SalesHistoryComponent } from '@components/ts/sales-history.component';
 
 export const routes: Routes = [
   {

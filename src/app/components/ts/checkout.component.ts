@@ -1,26 +1,27 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
   signal,
   computed,
   WritableSignal,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { Sale } from '../models/sale.model';
-import { SaleService } from '../services/sale.service';
+import { Sale } from '@models/sale.model';
+import { SaleService } from '@services/sale.service';
 import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { environment } from '@env/environment';
 import { DatePipe, CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-checkout',
-  templateUrl: './checkout.component.html',
+  templateUrl: '../html/checkout.component.html',
   standalone: true,
   imports: [DatePipe, CurrencyPipe],
   hostDirectives: [],
 })
-export class CheckoutComponent implements OnInit {
+export class CheckoutComponent implements OnInit, OnDestroy {
   profileid: number = 1;
   checkoutData: WritableSignal<Sale | null> = signal(null);
 
@@ -38,6 +39,23 @@ export class CheckoutComponent implements OnInit {
     this.loadcheckout();
   }
 
+  ngOnDestroy(): void {
+    // Call failSale if sale wasn't confirmed or canceled
+    const saleId = this.checkoutData()?.id;
+    const status = this.checkoutData()?.status;
+
+    if (saleId && status !== 'CONFIRMED' && status !== 'CANCELLED') {
+      this.saleService.failSale(saleId).subscribe({
+        next: (cart) => {
+          console.log('Sale failed due to navigation away from checkout');
+        },
+        error: (error) => {
+          console.error('Error failing sale:', error);
+        }
+      });
+    }
+  }
+
   confirmPurchase(): void {
     const saleId = this.checkoutData()?.id;
     if (!saleId) return;
@@ -51,14 +69,14 @@ export class CheckoutComponent implements OnInit {
         })
       )
       .subscribe((sale: Sale | null) => {
-        if (sale) {
-          this.checkoutData.set(sale);
-          console.log('Purchase confirmed:', sale);
-          alert('Compra confirmada');
-          this.router.navigate(['/']);
-        } else {
+        if (!sale) {
           console.error('Error: Sale is null');
+          return;
         }
+        this.checkoutData.set(sale);
+        console.log('Purchase confirmed:', sale);
+        alert('Compra confirmada');
+        this.router.navigate(['/']);
       });
   }
 

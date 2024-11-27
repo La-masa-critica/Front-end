@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { CartStateService } from './services/cart-state.service';
+import { CartStateService } from '@services/cart-state.service';
 import { NgClass } from '@angular/common';
 
 @Component({

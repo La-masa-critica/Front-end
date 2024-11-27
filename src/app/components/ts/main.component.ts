@@ -5,23 +5,23 @@ import {
   computed,
   WritableSignal,
 } from '@angular/core';
-import { ItemService } from '../services/item.service';
-import { CategoryService } from '../services/category.service';
-import { Item } from '../models/item.model';
-import { Category } from '../models/category.model';
+import { ItemService } from '@services/item.service';
+import { CategoryService } from '@services/category.service';
+import { Item } from '@models/item.model';
+import { Category } from '@models/category.model';
 import { catchError, of } from 'rxjs';
-import { SaleService } from '../services/sale.service';
-import { CartService } from '../services/cart.service';
-import { Sale } from '../models/sale.model';
+import { SaleService } from '@services/sale.service';
+import { CartService } from '@services/cart.service';
+import { Sale } from '@models/sale.model';
 import { Router } from '@angular/router';
-import { environment } from '../../environments/environment';
+import { environment } from '@env/environment';
 import { DecimalPipe, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { CartStateService } from '../services/cart-state.service';
+import { CartStateService } from '@services/cart-state.service';
 
 @Component({
   selector: 'app-main',
-  templateUrl: './main.component.html',
+  templateUrl: '../html/main.component.html',
   standalone: true,
   imports: [FormsModule, DecimalPipe, NgOptimizedImage],
   providers: [ItemService, CategoryService, SaleService, CartService],
@@ -37,6 +37,17 @@ export class MainComponent implements OnInit {
       this.cartState.cartData()?.items.reduce((acc, item) => {
         return acc + (item.price ?? 0) * item.quantity;
       }, 0) ?? 0
+    );
+  });
+
+  hasDisabledItems = computed(() => {
+    return (
+      this.cartState
+        .cartData()
+        ?.items.some(
+          (item) =>
+            this.allItems.find((i) => i.id === item.itemId)?.enabled === false
+        ) ?? false
     );
   });
 
@@ -73,9 +84,9 @@ export class MainComponent implements OnInit {
       )
       .subscribe((data) => {
         const sortedData = data.sort((a, b) => a.id - b.id);
-        this.items.set(sortedData);
-        this.allItems = sortedData; // Save copy for filtering
-        this.cartLoadNamesAndPrice(); // Ensure names are loaded after items are loaded
+        this.allItems = sortedData;
+        this.items.set(sortedData.filter((item) => item.enabled));
+        this.cartLoadNamesAndPrice();
       });
   }
 
@@ -99,17 +110,17 @@ export class MainComponent implements OnInit {
     const selectedCategoryIds = this.selectedCategories().map(
       (category) => category.id
     );
-    if (selectedCategoryIds.length > 0) {
-      this.items.set(
-        this.allItems.filter((item) =>
-          item.categoryList.some((category) =>
-            selectedCategoryIds.includes(category.id)
-          )
-        )
-      );
-    } else {
+    if (selectedCategoryIds.length === 0) {
       this.items.set(this.allItems);
+      return;
     }
+    this.items.set(
+      this.allItems.filter((item) =>
+        item.categoryList.some((category) =>
+          selectedCategoryIds.includes(category.id)
+        )
+      )
+    );
     this.cartLoadNamesAndPrice();
   }
 
@@ -152,11 +163,6 @@ export class MainComponent implements OnInit {
 
     const minPrice = this.minPrice ? parseFloat(this.minPrice) : undefined;
     const maxPrice = this.maxPrice ? parseFloat(this.maxPrice) : undefined;
-    console.log(minPrice);
-    console.log(maxPrice);
-    console.log(categoryIds);
-    console.log(this.categories().map((category) => category.id));
-
     this.itemService
       .filterItems(categoryIds, minPrice, maxPrice)
       .pipe(
@@ -185,21 +191,22 @@ export class MainComponent implements OnInit {
         })
       )
       .subscribe((cartDataFound) => {
-        if (cartDataFound) {
-          // Sort items by itemId before setting cart data
-          if (cartDataFound.items) {
-            cartDataFound.items.sort((a, b) => a.itemId - b.itemId);
-          }
-          this.cartState.cartData.set(cartDataFound);
-          this.cartLoadNamesAndPrice(); // Ensure names are loaded after cart is loaded
-          if ((cartDataFound?.items?.length ?? 0) > 0) {
-            this.cartState.isCartOpen.set(true); // Open the cart if there are items
-          }
+        if (!cartDataFound) {
+          this.cartState.cartData.set(null);
+          return;
         }
+
+        if (cartDataFound.items) {
+          cartDataFound.items.sort((a, b) => a.itemId - b.itemId);
+        }
+
+        this.cartState.isCartOpen.set(cartDataFound.items.length > 0);
+        this.cartState.cartData.set(cartDataFound);
+        this.cartLoadNamesAndPrice(); // Ensure names are loaded after cart is loaded
       });
   }
 
-  cartLoadNamesAndPrice(): void {
+  private cartLoadNamesAndPrice(): void {
     this.cartState.cartData.update((currentCart) => {
       if (!currentCart?.items) return currentCart;
 
@@ -236,8 +243,18 @@ export class MainComponent implements OnInit {
       alert('Este producto está agotado');
       return;
     }
-
     this.isLoading.set(true);
+
+    const cartItem = this.cartState
+      .cartData()
+      ?.items.find((i) => i.itemId === itemId);
+    if (cartItem) {
+      this.increaseQuantity(cartItem);
+      this.isLoading.set(false);
+      return;
+    }
+
+
     this.cartService
       .addCart(this.profileid, itemId, 1)
       .pipe(
@@ -248,15 +265,16 @@ export class MainComponent implements OnInit {
         })
       )
       .subscribe({
-        next: (cart) => {
-          if (cart) {
-            this.cartState.cartData.set(cart);
-            this.cartLoadNamesAndPrice();
-            this.cartState.isCartOpen.set(true);
-          }
-        },
+        next: (cart) => this.handleAddToCartSuccess(cart),
         complete: () => this.isLoading.set(false),
       });
+  }
+
+  private handleAddToCartSuccess(cart: any): void {
+    if (!cart) return;
+    this.cartState.cartData.set(cart);
+    this.cartLoadNamesAndPrice();
+    this.cartState.isCartOpen.set(true);
   }
 
   eliminateToCart(itemId: number): void {
@@ -344,14 +362,10 @@ export class MainComponent implements OnInit {
   }
 
   emptyCart(): void {
-    if (this.cartState.cartData()) {
-      this.cartState.cartData()?.items.forEach((item) => {
-        this.cartService
-          .removeFromCart(this.profileid, item.itemId)
-          .subscribe(() => {
-            this.loadCart();
-          });
-      });
-    }
+    this.cartService.emptyCart(this.profileid).subscribe(() => this.loadCart());
+  }
+
+  isItemEnabled(itemId: number): boolean {
+    return this.allItems.find((i) => i.id === itemId)?.enabled ?? false;
   }
 }
