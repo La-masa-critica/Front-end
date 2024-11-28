@@ -144,7 +144,12 @@
             >
               -
             </button>
-            <span class="mx-2">{{ item.quantity }}</span>
+            <input
+              type="number"
+              [(ngModel)]="item.quantity"
+              (change)="updateQuantity(item)"
+              class="w-12 text-center border border-indigo-300 rounded"
+            />
             <button
               (click)="increaseQuantity(item)"
               class="bg-green-500 text-white p-2 rounded hover:bg-green-400 w-8 h-8 flex items-center justify-center"

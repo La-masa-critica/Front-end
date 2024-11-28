@@ -301,7 +301,7 @@ export class MainComponent implements OnInit {
   }
 
   decreaseQuantity(item: { itemId: number; quantity: number }): void {
-    if (item.quantity > 0) {
+    if (item.quantity > 1) {
       item.quantity -= 1;
       this.cartService.queueUpdateCartQuantity(
         this.profileid,
@@ -309,15 +309,30 @@ export class MainComponent implements OnInit {
         item.quantity
       );
       this.cartLoadNamesAndPrice();
+    }else{
+      this.eliminateToCart(item.itemId)
     }
   }
 
   updateQuantity(item: { itemId: number; quantity: number }): void {
-    this.cartService.queueUpdateCartQuantity(
-      this.profileid,
-      item.itemId,
-      item.quantity
-    );
+    const product = this.items().find((i) => i.id === item.itemId);
+    if (!product) {
+      alert('Producto no encontrado');
+      return;
+    }
+    if (item.quantity > product.stock) {
+      alert('No hay más stock disponible');
+      item.quantity = product.stock;
+    }
+    if(item.quantity === 0) {
+      this.eliminateToCart(item.itemId)
+    }else{
+      this.cartService.queueUpdateCartQuantity(
+        this.profileid,
+        item.itemId,
+        item.quantity
+      );
+    }
     this.cartLoadNamesAndPrice();
   }
 

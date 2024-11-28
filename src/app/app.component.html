@@ -26,12 +26,14 @@
         Ver Carrito ({{ cartState.cartItemCount() }})
       </button>
       }
+      @if (router.url !== '/login' && router.url !== '/register') {
       <button
         (click)="logout()"
         class="bg-red-600 p-2 rounded hover:bg-red-500 ml-2"
       >
         Logout
       </button>
+      }
     </div>
   </nav>
 
