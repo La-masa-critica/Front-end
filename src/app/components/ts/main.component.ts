@@ -69,9 +69,9 @@ export class MainComponent implements OnInit {
   ngOnInit(): void {
     this.loadItems();
     this.loadCategories();
+    setTimeout(() => {
     this.loadCart();
-    this.cartState.isCartOpen.set(true);
-    this.cartLoadNamesAndPrice();
+    }, 300); 
   }
 
   //Carga productos
