@@ -11,7 +11,6 @@ import { environment } from '@env/environment';
 export class SaleService {
   private readonly apiUrl = environment.saleApiUrl;
   private readonly updateQuantitySubject = new Subject<{
-    profileId: number;
     itemId: number;
     quantity: number;
   }>();
@@ -25,10 +24,9 @@ export class SaleService {
     });
   }
 
-  checkout(cartId: number): Observable<Sale> {
-    const params = new HttpParams().set('cartId', cartId);
+  checkout(): Observable<Sale> {
     const headers = this.getAuthHeaders();
-    return this.http.post<Sale>(`${this.apiUrl}/checkout`, {}, { headers, params });
+    return this.http.post<Sale>(`${this.apiUrl}/checkout`, {}, { headers });
   }
 
   confirmSale(saleId: number | undefined): Observable<Sale> {
@@ -63,9 +61,8 @@ export class SaleService {
     return this.http.get<Sale>(`${this.apiUrl}/${saleId}`, { headers });
   }
 
-  getSaleByProfileId(profileId: number): Observable<Sale[]> {
-    const params = new HttpParams().set('profileId', profileId);
+  getSaleByProfileId(): Observable<Sale[]> {
     const headers = this.getAuthHeaders();
-    return this.http.get<Sale[]>(`${this.apiUrl}`, { headers, params });
+    return this.http.get<Sale[]>(`${this.apiUrl}`, { headers });
   }
 }

@@ -16,13 +16,12 @@ import { DatePipe, CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-checkout',
-  templateUrl: '../html/checkout.component.html',
+  templateUrl: './checkout.component.html',
   standalone: true,
   imports: [DatePipe, CurrencyPipe],
   hostDirectives: [],
 })
 export class CheckoutComponent implements OnInit, OnDestroy {
-  profileid: number = 1;
   checkoutData: WritableSignal<Sale | null> = signal(null);
 
   // Add computed properties

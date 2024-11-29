@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CartStateService } from '@services/cart-state.service';
 import { NgClass } from '@angular/common';
-import { authService } from '@services/authService';
+import { AuthService } from '@app/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +14,7 @@ export class AppComponent {
   constructor(
     public readonly router: Router,
     public readonly cartState: CartStateService,
-    private readonly authService: authService
+    private readonly authService: AuthService
   ) {}
 
   logout(): void {

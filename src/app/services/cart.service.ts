@@ -11,7 +11,6 @@ import { environment } from '@env/environment';
 export class CartService {
   private readonly apiUrl = environment.cartApiUrl;
   private readonly updateQuantitySubject = new Subject<{
-    profileId: number;
     itemId: number;
     quantity: number;
   }>();
@@ -19,9 +18,9 @@ export class CartService {
   constructor(private readonly http: HttpClient) {
     this.updateQuantitySubject
       .pipe(
-        debounceTime(300), // Adjust the debounce time as needed
-        switchMap(({ profileId, itemId, quantity }) =>
-          this.updateCartQuantity(profileId, itemId, quantity)
+        debounceTime(300),
+        switchMap(({itemId, quantity }) =>
+          this.updateCartQuantity(itemId, quantity)
         )
       )
       .subscribe();
@@ -35,9 +34,8 @@ export class CartService {
     });
   }
 
-  addCart(cartId: number, itemId: number, quantity: number): Observable<Cart> {
+  addCart(itemId: number, quantity: number): Observable<Cart> {
     const body = {
-      cartId: cartId,
       itemId: itemId,
       quantity: quantity,
     };
@@ -45,36 +43,33 @@ export class CartService {
     return this.http.post<Cart>(`${this.apiUrl}/add`, body, { headers });
   }
 
-  emptyCart(profileId: number): Observable<void> {
-    const params = { profileId: profileId };
+  emptyCart(): Observable<void> {
     const headers = this.getAuthHeaders();
-    return this.http.delete<void>(`${this.apiUrl}/clear`, { headers, params });
+    return this.http.delete<void>(`${this.apiUrl}/clear`, { headers });
   }
 
-  removeFromCart(profileId: number, itemId: number): Observable<Cart> {
-    const params = { profileId: profileId, itemId: itemId };
+  removeFromCart(itemId: number): Observable<Cart> {
+    const params = {itemId: itemId };
     const headers = this.getAuthHeaders();
     return this.http.delete<Cart>(`${this.apiUrl}/delete`, { headers, params });
   }
 
-  getCartByProfileId(profileId: number): Observable<Cart> {
-    const url = `${this.apiUrl}/${profileId}`;
+  getCartByProfileId(): Observable<Cart> {
+    const url = `${this.apiUrl}`;
     const headers = this.getAuthHeaders();
     return this.http.get<Cart>(url, { headers });
   }
 
   updateCartQuantity(
-    profileId: number,
     itemId: number,
     quantity: number
   ): Observable<Cart> {
     if (quantity < 0) {
-      return of({ id: profileId, items: [], enabled: true } as Cart);
+      return of({ id: 0, items: [], enabled: true } as Cart);
     }
 
     const headers = this.getAuthHeaders();
     const params = new HttpParams()
-      .set('profileId', profileId)
       .set('itemId', itemId)
       .set('quantity', quantity);
 
@@ -82,29 +77,26 @@ export class CartService {
   }
 
   queueUpdateCartQuantity(
-    profileId: number,
     itemId: number,
     quantity: number
   ): void {
-    this.updateQuantitySubject.next({ profileId, itemId, quantity });
+    this.updateQuantitySubject.next({itemId, quantity });
   }
 
   increaseQuantity(
-    profileId: number,
     item: { itemId: number; quantity: number }
   ): Observable<Cart> {
     item.quantity += 1;
-    return this.updateCartQuantity(profileId, item.itemId, item.quantity);
+    return this.updateCartQuantity(item.itemId, item.quantity);
   }
 
   decreaseQuantity(
-    profileId: number,
     item: { itemId: number; quantity: number }
   ): Observable<Cart> {
     if (!item || item.quantity <= 0) {
-      return of({ id: profileId, items: [], enabled: true } as Cart);
+      return of({id: 0, items: [], enabled: true } as Cart);
     }
     item.quantity -= 1;
-    return this.updateCartQuantity(profileId, item.itemId, item.quantity);
+    return this.updateCartQuantity( item.itemId, item.quantity);
   }
 }

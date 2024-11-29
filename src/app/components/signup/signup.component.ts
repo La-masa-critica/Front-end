@@ -1,21 +1,21 @@
 import { Component } from '@angular/core';
-import { authService } from '@app/services/authService';
+import { AuthService } from '@app/services/auth.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Registro } from '@app/models/registro';
+import { Registro } from '@app/models/registro.model';
 
 @Component({
   selector: 'app-register',
-  templateUrl: '../html/registroComponent.html', // Update the template URL
-  imports: [FormsModule, CommonModule], 
+  templateUrl: 'signup.component.html', // Update the template URL
+  imports: [FormsModule, CommonModule],
   standalone: true
 })
-export class registerComponent {
-  registro: Registro = { username: "", password: "", name: "", email: "", phone: "" }; 
+export class RegisterComponent {
+  registro: Registro = { username: "", password: "", name: "", email: "", phone: "" };
   errorMessage = '';
 
-  constructor(private authService: authService, private router: Router) {}
+  constructor(private readonly authService: AuthService, private readonly router: Router) {}
 
   register(): void {
     this.authService.register(this.registro).subscribe({

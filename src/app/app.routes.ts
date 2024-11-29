@@ -1,19 +1,19 @@
 import { Routes } from '@angular/router';
-import { MainComponent } from '@components/ts/main.component';
-import { CheckoutComponent } from '@components/ts/checkout.component';
-import { SalesHistoryComponent } from '@components/ts/sales-history.component';
-import { loginComponent } from '@components/ts/loginComponent';
-import { AuthGuard } from './services/authGuard';
-import { registerComponent } from './components/ts/register.component';
+import { MainComponent } from '@app/components/main/main.component';
+import { CheckoutComponent } from '@app/components/checkout/checkout.component';
+import { SalesHistoryComponent } from '@app/components/sales-hisoty/sales-history.component';
+import { LoginComponent } from '@app/components/login/login.component';
+import { AuthGuard } from './services/auth.guard';
+import { RegisterComponent } from './components/signup/signup.component';
 
 export const routes: Routes = [
   {
     path: 'login',
-    component: loginComponent,
+    component: LoginComponent,
   },
   {
     path: 'register',
-    component: registerComponent,
+    component: RegisterComponent,
   },
   {
     path: '',

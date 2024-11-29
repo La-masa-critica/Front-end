@@ -21,7 +21,7 @@ import { CartStateService } from '@services/cart-state.service';
 
 @Component({
   selector: 'app-main',
-  templateUrl: '../html/main.component.html',
+  templateUrl: './main.component.html',
   standalone: true,
   imports: [FormsModule, DecimalPipe, NgOptimizedImage],
   providers: [ItemService, CategoryService, SaleService, CartService],
@@ -53,7 +53,6 @@ export class MainComponent implements OnInit {
 
   minPrice: string = '';
   maxPrice: string = '';
-  readonly profileid: number = 1;
   allItems: Item[] = [];
   currentSale: Sale | null = null;
 
@@ -71,7 +70,7 @@ export class MainComponent implements OnInit {
     this.loadCategories();
     setTimeout(() => {
     this.loadCart();
-    }, 300); 
+    }, 300);
   }
 
   //Carga productos
@@ -185,7 +184,7 @@ export class MainComponent implements OnInit {
   //LOGICA DEL CARRITO A PARTIR DE AQUI
   loadCart(): void {
     this.cartService
-      .getCartByProfileId(this.profileid)
+      .getCartByProfileId()
       .pipe(
         catchError((error) => {
           console.error('Error loading cart:', error);
@@ -258,7 +257,7 @@ export class MainComponent implements OnInit {
 
 
     this.cartService
-      .addCart(this.profileid, itemId, 1)
+      .addCart(itemId, 1)
       .pipe(
         catchError((error) => {
           console.error('Error adding to cart:', error);
@@ -280,7 +279,7 @@ export class MainComponent implements OnInit {
   }
 
   eliminateToCart(itemId: number): void {
-    this.cartService.removeFromCart(this.profileid, itemId).subscribe(() => {
+    this.cartService.removeFromCart(itemId).subscribe(() => {
       this.loadCart();
     });
   }
@@ -293,7 +292,6 @@ export class MainComponent implements OnInit {
     }
     item.quantity += 1;
     this.cartService.queueUpdateCartQuantity(
-      this.profileid,
       item.itemId,
       item.quantity
     );
@@ -304,7 +302,6 @@ export class MainComponent implements OnInit {
     if (item.quantity > 1) {
       item.quantity -= 1;
       this.cartService.queueUpdateCartQuantity(
-        this.profileid,
         item.itemId,
         item.quantity
       );
@@ -328,7 +325,6 @@ export class MainComponent implements OnInit {
       this.eliminateToCart(item.itemId)
     }else{
       this.cartService.queueUpdateCartQuantity(
-        this.profileid,
         item.itemId,
         item.quantity
       );
@@ -351,7 +347,7 @@ export class MainComponent implements OnInit {
       return;
     }
 
-    this.saleService.checkout(cart.id).subscribe({
+    this.saleService.checkout().subscribe({
       next: (sale) => {
         this.currentSale = sale;
         environment.currentSale = sale;
@@ -379,7 +375,7 @@ export class MainComponent implements OnInit {
   }
 
   emptyCart(): void {
-    this.cartService.emptyCart(this.profileid).subscribe(() => this.loadCart());
+    this.cartService.emptyCart().subscribe(() => this.loadCart());
   }
 
   isItemEnabled(itemId: number): boolean {

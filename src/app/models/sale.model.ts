@@ -7,7 +7,6 @@ export interface SaleDetail {
 
 export interface Sale {
   id: number;
-  profileId: number;
   date: string;
   status: string;
   total: number;

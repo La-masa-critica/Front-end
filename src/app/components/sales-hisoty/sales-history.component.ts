@@ -6,7 +6,7 @@ import { DatePipe, CurrencyPipe, NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-sales-history',
-  templateUrl: '../html/sales-history.component.html',
+  templateUrl: './sales-history.component.html',
   standalone: true,
   imports: [DatePipe, CurrencyPipe, NgClass],
 })
@@ -14,7 +14,6 @@ export class SalesHistoryComponent implements OnInit {
   sales = signal<Sale[]>([]);
   isLoading = signal(false);
   error = signal<string | null>(null);
-  readonly profileId = 1;
 
   constructor(private readonly saleService: SaleService) {}
 
@@ -26,7 +25,7 @@ export class SalesHistoryComponent implements OnInit {
     this.isLoading.set(true);
     this.error.set(null);
 
-    this.saleService.getSaleByProfileId(this.profileId).subscribe({
+    this.saleService.getSaleByProfileId().subscribe({
       next: (sales) => {
         this.sales.set(
           sales.toSorted((a, b) => {
