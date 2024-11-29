@@ -19,17 +19,22 @@ RUN npm run build
 # Use the official Nginx image to serve the application
 FROM docker.io/nginx:alpine
 
-# Add extra hosts configuration
-RUN echo -e "# Allow Docker Host Resolution\n127.0.0.1 host.docker.internal" >> /etc/hosts
+# Set a working directory for scripts
+WORKDIR /etc/nginx
 
 # Copy the built application from the previous stage
 COPY --from=build /app/dist/my-project /usr/share/nginx/html
 
-# Add the custom Nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy the Nginx configuration template and the entrypoint script
+COPY nginx.conf.template /etc/nginx/conf.d/default.conf.template
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+
+# Set permissions for the entrypoint script
+RUN chmod +x /docker-entrypoint.sh
 
 # Expose port 80 for the frontend
 EXPOSE 80
 
-# Start Nginx server
-CMD ["sh", "-c", "nginx -g 'daemon off;'"]
+# Use the entrypoint script to start the container
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]
