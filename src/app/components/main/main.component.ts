@@ -70,7 +70,7 @@ export class MainComponent implements OnInit {
     this.loadCategories();
     setTimeout(() => {
     this.loadCart();
-    }, 300);
+    }, 700);
   }
 
   //Carga productos
